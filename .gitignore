@@ -46,6 +46,7 @@ localsettings.py
 .DS_STORE
 tags
 */**/.DS_STORE
+logs/*
 
 #db file
 *.sqlite3
