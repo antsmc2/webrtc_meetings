@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+</head>
+<body>
+    <div id="main">
+        <section id="constraints">
+        <div id="getUserMedia">
+        <div class="input">
+          <h2>Camera constraints</h2>
+          <div id="minWidth">
+            <label>Min width <span>300</span>px:</label>
+            <input type="range" min="0" max="1920" value="300">
+          </div>
+          <div id="maxWidth">
+            <label>Max width <span>640</span>px:</label>
+            <input type="range" min="0" max="1920" value="640">
+          </div>
+          <div id="minHeight">
+            <label>Min height <span>200</span>px:</label>
+            <input type="range" min="0" max="1080" value="200">
+          </div>
+          <div id="maxHeight">
+            <label>Max height <span>480</span>px:</label>
+            <input type="range" min="0" max="1080" value="480">
+          </div>
+          <div id="framerate">
+            <label>Frame rate <span>10</span>fps:</label>
+            <input type="range" min="0" max="60" value="10">
+          </div>
+        </div>
+        <div id="getUserMediaConstraints" class="output"></div>
+      </div>
+
+    </section>
+        <div id="video-settings" class="video">
+            <div id="bandwidth-setting"></div>
+            <div id="toggle-audio"></div>
+            <div id="toggle-video"></div>
+            <div id="record-call"></div>
+        </div>
+        <div id="all-video">
+            <div id="my-video-container"></div>
+            <div id="video-container" class="video">
+            </div>
+            <div id="chat-container" class="chat">
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="{% static "js/common.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/meetings.js" %}"></script>
+    <script type="text/javascript">
+        connect('{{ meeting_uri }}', '{{ ice_uri }}');
+    </script>
+</body>
+</html>
