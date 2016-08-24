@@ -18,7 +18,7 @@ from django.contrib import admin
 from meeting_room.urls import meeting_room_urls
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^confce/admin/', include(admin.site.urls)),
 ]
 
 urlpatterns = urlpatterns + meeting_room_urls
