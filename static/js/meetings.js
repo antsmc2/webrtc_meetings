@@ -10,6 +10,7 @@ var localStream = null;
 var peers = {};
 var dataChannels = {}
 var remoteVideos = {}
+var receivedFiles = {}
 var minWidthInput = document.querySelector('div#minWidth input');
 var maxWidthInput = document.querySelector('div#maxWidth input');
 var minHeightInput = document.querySelector('div#minHeight input');
@@ -20,14 +21,21 @@ minWidthInput.onchange = maxWidthInput.onchange =
     framerateInput.onchange = displayRangeValue;
 var getUserMediaConstraintsDiv =
     document.querySelector('div#getUserMediaConstraints');
+var fileInput = document.querySelector('input#fileInput');
+var downloadAnchor = document.querySelector('a#download');
+var sendProgress = document.querySelector('progress#sendProgress');
+var receiveProgress = document.querySelector('progress#receiveProgress');
+var statusMessage = document.querySelector('span#status');
 
+fileInput.onchange = function () {
+    sendData();
+}
 // Utility to show the value of a range in a sibling span element
 function displayRangeValue(e) {
   var span = e.target.parentElement.querySelector('span');
   span.textContent = e.target.value;
 
 }
-
 
 var offerOptions = {
   offerToReceiveAudio: 1,
@@ -53,9 +61,10 @@ var NEW_ICE_FOUND = 'NEW-ICE-FOUND'
 var TEXT_MESSAGE = 'TEXT-MESSAGE'
 // ---------------------//
 
-//Text message types //
+//message types //
 var SERVER_NOTICE = 1
 var PEER_TEXT = 2
+var PEER_BINARY = 3
 //------------------//
 var iceServers;
 function getIceServers() {
@@ -94,10 +103,10 @@ function getUserMediaConstraints() {
 var connection = null;
 
 // Simulate an ice restart.
-function restartIce() {
+function restartIce(peer_id) {
   offerOptions.iceRestart = true;
-  trace('my createOffer restart');
-  peers[uniqueId].createOffer(
+  trace(peer_id + ' createOffer restart');
+  peers[peer_id].createOffer(
     offerOptions
   ).then(
     onCreateOfferSuccess,
@@ -244,11 +253,12 @@ function start(onMediaInit) {
 
 function gotLocalStream(stream) {
   trace('Received local stream');
+  localVideoContainer.innerHTML = '';
   localVideo = document.createElement('video');
-  videoContainer.appendChild(remoteVideo);
+  localVideoContainer.appendChild(localVideo);
   localVideo.src = window.URL.createObjectURL(stream);
   localVideo.srcObject = stream;
-  localVideoContainer = localVideoContainer.appendChild(localVideo);
+  localVideo.id = uniqueId;
   localStream = stream;
   trace('done setting local stream');
 }
@@ -485,11 +495,12 @@ function receiveDataChannel(event, peer_id) {
 function setUpDataChannel(peer_id) {
   trace('setting up data channel: ' + peer_id);
   var dataChannel = dataChannels[peer_id];
+  dataChannel.binaryType = 'arraybuffer';
   dataChannel.onerror = function (error) {
     trace(peer_id + ": Data Channel Error:" + error);
   };
 
-  dataChannel.onmessage = onReceiveDataChannelMessage;
+  dataChannel.onmessage = function(e) { onReceiveDataChannelMessage(e, peer_id); };
 
   dataChannel.onopen = function () {
     trace(peer_id + ' Send channel state is: ' + dataChannel.readyState);
@@ -506,18 +517,58 @@ function setUpDataChannel(peer_id) {
 
 
 
-function onReceiveDataChannelMessage (event, peer_id) {
-    trace(per_id + ": Got Data Channel Message:" + event.data);
+function onReceiveDataChannelMessage(event, peer_id) {
+    trace(peer_id + ": Got Data Channel message: " + event.data);
     var msg = JSON.parse(event.data);
-    switch(msg.type) {
-        case MESSAGE:
+    switch(msg['msgType']) {
+        case PEER_TEXT:
             updateChat(msg, PEER_TEXT);
             break;
         case "hang-up":
             handleHangUpMsg(msg);
             break;
+        case PEER_BINARY:
+            handleReceivedBinaryMessage(msg);
+            break;
     };
-  };
+};
+
+function handleReceivedBinaryMessage(msg) {
+
+  msg['payload'] = base64ToArrayBuffer(msg['payload']);
+  if(!(msg['sendId'] in receivedFiles)){
+     trace('creating binary file: ' + msg['sendId']);
+     receivedFiles[msg['sendId']] = {'file-name': msg['fileName'],
+                                        'uploaded': msg['uploaded'],
+                                        'payload': [], //payload would serve as receive buffer
+                                        'sender': msg['sender'],
+                                        'size': 0,
+                                        'expectedSize': msg['fileSize']
+                                        };
+     receiveProgress.max = msg['fileSize'];
+     downloadAnchor.href = '';
+     downloadAnchor.download = '';
+     downloadAnchor.textContent = '';
+  }
+  receivedFiles[msg['sendId']]['payload'].push(msg['payload']);
+  receivedFiles[msg['sendId']]['size'] += msg['payload'].byteLength;
+  var receivedSize = receivedFiles[msg['sendId']]['size'];
+  receiveProgress.value = receivedFiles[msg['sendId']]['size'];
+
+  // we are assuming that our signaling protocol told
+  // about the expected file size (and name, hash, etc).
+  if (receivedSize === msg['fileSize']) {
+    var received = new window.Blob(receivedFiles[msg['sendId']]['payload']);
+
+    downloadAnchor.href = URL.createObjectURL(received);
+    downloadAnchor.download = msg['fileName'];
+    downloadAnchor.textContent =
+      'Click to download \'' + msg['fileName'] + '\' (' + msg['fileSize'] + ' bytes)';
+    downloadAnchor.style.display = 'block';
+
+  }
+}
+
 
 function updateChat(msg, text_type) {
 
@@ -540,4 +591,66 @@ function muteVideo() {
 function muteAudio() {
   if(localStream)
     localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+}
+
+function sendData() {
+  var file = fileInput.files[0];
+  var sendId = uniqueId + '.' + Math.floor((1 + Math.random()) * 0x1000000);
+  trace('file is ' + [file.name, file.size, file.type,
+      file.lastModifiedDate].join(' '));
+
+  // Handle 0 size files.
+  statusMessage.textContent = '';
+  downloadAnchor.textContent = '';
+  if (file.size === 0) {
+    bitrateDiv.innerHTML = '';
+    statusMessage.textContent = 'File is empty, please select a non-empty file';
+    closeDataChannels();
+    return;
+  }
+  sendProgress.max = file.size;
+  var chunkSize = 10240;
+  var sliceFile = function(offset) {
+    var reader = new window.FileReader();
+    reader.onload = (function() {
+      return function(e) {
+        for(var peer_id in dataChannels) {
+            trace('sending ' + e.target.result);
+            var piece = {'msgType': PEER_BINARY, 'payload': arrayBufferToBase64(e.target.result),
+                                    'sender': uniqueId, 'fileName': file.name,
+                                    'offset': offset, 'fileSize': file.size, 'uploaded': new Date(),
+                                    'sendId': sendId};
+            piece = JSON.stringify(piece);
+            trace('sending: ' + piece);
+            dataChannels[peer_id].send(piece);
+         }
+        if (file.size > offset + e.target.result.byteLength)
+          window.setTimeout(sliceFile, 0, offset + chunkSize);
+        sendProgress.value = offset + e.target.result.byteLength;
+      };
+    })(file);
+    var slice = file.slice(offset, offset + chunkSize);
+    reader.readAsArrayBuffer(slice);
+  };
+  sliceFile(0);
+}
+
+function arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
+
+function base64ToArrayBuffer(base64) {
+    var binary_string =  window.atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array( len );
+    for (var i = 0; i < len; i++)        {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
 }

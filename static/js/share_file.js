@@ -22,6 +22,8 @@ var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#status');
 
+
+
 var receiveBuffer = [];
 var receivedSize = 0;
 

@@ -11,7 +11,7 @@
         <section id="constraints">
         <div id="getUserMedia">
         <div class="input">
-          <h2>Camera constraints</h2>
+          <h2>Camera settings</h2>
           <div id="minWidth">
             <label>Min width <span>300</span>px:</label>
             <input type="range" min="0" max="1920" value="300">
@@ -37,18 +37,38 @@
       </div>
 
     </section>
-        <div id="video-settings" class="video">
-            <div id="bandwidth-setting"></div>
-            <div id="toggle-audio"></div>
-            <div id="toggle-video"></div>
-            <div id="record-call"></div>
-        </div>
-        <div id="all-video">
-            <div id="my-video-container"></div>
-            <div id="video-container" class="video">
+        <div id="webtrc">
+            <div id="video-settings" class="video">
+                <div id="bandwidth-setting"></div>
+                <div id="toggle-audio"></div>
+                <div id="toggle-video"></div>
+                <div id="record-call"></div>
             </div>
-            <div id="chat-container" class="chat">
+            <div id="all-video">
+                <div id="my-video-container"></div>
+                <div id="video-container" class="video">
+                </div>
+                <div id="chat-container" class="chat">
 
+                </div>
+            </div>
+            <div id="file-share" class="file-share">
+                <form id="fileInfo">
+                    <input type="file" id="fileInput" name="files"/>
+                </form>
+                <div class="progress">
+                    <div class="label">Send progress: </div>
+                    <progress id="sendProgress" max="0" value="0"></progress>
+                </div>
+                  <div id="downloads">
+                      <div class="progress">
+                        <div class="label">Receive progress: </div>
+                        <progress id="receiveProgress" max="0" value="0"></progress>
+                      </div>
+                      <div id="bitrate"></div>
+                      <a id="download"></a>
+                      <span id="status"></span>
+                  </div>
             </div>
         </div>
     </div>
