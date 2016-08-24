@@ -1,6 +1,9 @@
 "use strict";
-
+/*
+    File share part adapted from https://webrtc.github.io/samples/src/content/datachannel/filetransfer/
+*/
 //to do. Ability to refresh a particular peer
+
 var myHostname = window.location.hostname;
 var myPort = window.location.port;
 console.log("Hostname: " + myHostname);
@@ -26,6 +29,8 @@ var downloadAnchor = document.querySelector('a#download');
 var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#status');
+var downloadButton = document.getElementById('downloadRecord');
+downloadButton.disabled = true;
 
 fileInput.onchange = function () {
     sendData();
@@ -42,8 +47,8 @@ var offerOptions = {
   offerToReceiveVideo: 1
 };
 var dataChannelOptions = null;
-var videoContainer = document.getElementById('video-container');
-var localVideoContainer = document.getElementById('my-video-container');
+var videoContainer = document.getElementById('videoContainer');
+var localVideoContainer = document.getElementById('myVideoContainer');
 var localVideo = null;
 /*
 document.getElementById("my-video");
@@ -260,6 +265,8 @@ function gotLocalStream(stream) {
   localVideo.srcObject = stream;
   localVideo.id = uniqueId;
   localStream = stream;
+  window.stream = localStream;
+  downloadButton.disabled = false;
   trace('done setting local stream');
 }
 
@@ -635,6 +642,8 @@ function sendData() {
   sliceFile(0);
 }
 
+
+//thanks to https://chawi3.com/2015/03/03/arraybuffer-to-base64-base64-to-arraybuffer-javascript/
 function arrayBufferToBase64( buffer ) {
     var binary = '';
     var bytes = new Uint8Array( buffer );

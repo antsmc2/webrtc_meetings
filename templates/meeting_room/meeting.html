@@ -45,8 +45,8 @@
                 <div id="record-call"></div>
             </div>
             <div id="all-video">
-                <div id="my-video-container"></div>
-                <div id="video-container" class="video">
+                <div id="myVideoContainer"></div>
+                <div id="videoContainer" class="video">
                 </div>
                 <div id="chat-container" class="chat">
 
@@ -69,10 +69,17 @@
                       <a id="download"></a>
                       <span id="status"></span>
                   </div>
+                  <div id="recordings">
+                      <div>
+                          <button id="record">Start Recording</button>
+                          <button id="downloadRecord" disabled>Download</button>
+                      </div>
+                  </div>
             </div>
         </div>
     </div>
     <script type="text/javascript" src="{% static "js/common.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/recording.js" %}"></script>
     <script type="text/javascript" src="{% static "js/meetings.js" %}"></script>
     <script type="text/javascript">
         connect('{{ meeting_uri }}', '{{ ice_uri }}');
