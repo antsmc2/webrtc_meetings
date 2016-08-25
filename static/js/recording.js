@@ -133,7 +133,7 @@ function download() {
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
-  a.download = 'screen-' + new Data();
+  a.download = 'screen-' + new Date();
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
