@@ -123,7 +123,6 @@ function startRecording() {
 function stopRecording() {
   mediaRecorder.stop();
   console.log('Recorded Blobs: ', recordedBlobs);
-  recordedBlobs = [];
   recordStream = null;
 }
 
@@ -133,7 +132,9 @@ function download() {
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
-  a.download = 'screen-' + new Data();
+  if(!uniqueId)
+     var uniqueId = '';
+  a.download = 'screen-' + new Date() + uniqueId + '.webm';
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
@@ -151,7 +152,7 @@ if(window.navigator.userAgent.match('Chrome')) {
                 mandatory: {
                     maxWidth: window.screen.width,
                     maxHeight: window.screen.height,
-                    chromeMediaSource: 'screen'
+                    chromeMediaSource: 'window'
                 }
             },
             audio: true
@@ -159,21 +160,22 @@ if(window.navigator.userAgent.match('Chrome')) {
 } else if (window.navigator.userAgent.match('Firefox')) {
     screenConstraints = {
             video: {
-                mozMediaSource: 'screen',
-                mediaSource: 'screen'
+                mozMediaSource: 'window',
+                mediaSource: 'window'
             },
             audio: true
         };
 } else {
     screenConstraints = {
             video: {
-                mediaSource: 'screen'
+                mediaSource: 'window'
             },
             audio: true
         };
 }
 
 function startScreen(successCallback, failCallback) {
+    trace('using screen constrains: ' + JSON.stringify(screenConstraints));
     navigator.mediaDevices.getUserMedia(screenConstraints).then(function(stream){
         screenStream = stream;
         if(successCallback)

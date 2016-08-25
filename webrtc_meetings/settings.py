@@ -25,7 +25,7 @@ SECRET_KEY = ')3q*z-@97ql!1abn4#*0tezk4e_zxwbp&fq8)og1q)=*x0342a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', ]
 
 
 # Application definition
@@ -106,6 +106,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/home/administrator/static'
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # STATIC_DIR = (
@@ -120,7 +121,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_redis.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": ['redis://localhost:6379/10',],
         },
         "ROUTING": "webrtc_meetings.routing.channel_routing",
     },
