@@ -100,7 +100,7 @@ function getUserMediaConstraints() {
   if (framerateInput.value !== '0') {
     constraints.video.frameRate = {};
     constraints.video.frameRate.min = framerateInput.value;
-  }
+  } 
   return constraints;
 }
 
@@ -136,6 +136,7 @@ function gotRemoteStream(e, peer_id) {
   remoteVideo.srcObject = e.stream;
   remoteVideo.src = window.URL.createObjectURL(e.stream);
   remoteVideo.id = peer_id;
+  remoteVideo.autoplay = true;
   videoContainer.appendChild(remoteVideo);
   remoteVideos[peer_id] = remoteVideo;
   trace('received remote stream from: ' + peer_id);
@@ -264,6 +265,8 @@ function gotLocalStream(stream) {
   localVideo.src = window.URL.createObjectURL(stream);
   localVideo.srcObject = stream;
   localVideo.id = uniqueId;
+  localVideo.autoplay = true;
+  localVideo.muted = "muted";
   localStream = stream;
   window.stream = localStream;
   downloadButton.disabled = false;
