@@ -132,13 +132,9 @@ function download() {
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
-<<<<<<< HEAD
-  a.download = 'screen-' + new Date();
-=======
   if(!uniqueId)
      var uniqueId = '';
   a.download = 'screen-' + new Date() + uniqueId + '.webm';
->>>>>>> 7bfdf3a3c5fa70d689997d85033f9e04b2513580
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
@@ -147,36 +143,46 @@ function download() {
   }, 100);
 }
 
-var screenConstraints = null;
+    // Firefox 1.0+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Chrome 1+
+var isChrome = !!window.chrome && !!window.chrome.webstore;
+var chromeMediaSource = 'screen';
 
-if(window.navigator.userAgent.match('Chrome')) {
-    //boldly assuming Chrome 34+ and that chrome extension has been installed
-     screenConstraints = {
-            video: {
-                mandatory: {
-                    maxWidth: window.screen.width,
-                    maxHeight: window.screen.height,
-                    chromeMediaSource: 'window'
-                }
-            },
-            audio: true
-    };
-} else if (window.navigator.userAgent.match('Firefox')) {
-    screenConstraints = {
-            video: {
-                mozMediaSource: 'window',
-                mediaSource: 'window'
-            },
-            audio: true
+var screenConstraints = {
+  //video: getScreenConstraints(),//disabling for now
+  audio: true
+};
+
+
+
+// this function explains how to use above methods/objects
+function getScreenConstraints() {
+   if(isFirefox){
+        return {
+            mozMediaSource: 'window',
+            mediaSource: 'window'
         };
-} else {
-    screenConstraints = {
-            video: {
-                mediaSource: 'window'
+    }
+
+    // this statement defines getUserMedia constraints
+    // that will be used to capture content of screen
+    if(isChrome) {
+        return {
+            mandatory: {
+                chromeMediaSource: chromeMediaSource,
+                maxWidth: window.screen.width,
+                maxHeight: window.screen.height
             },
-            audio: true
+            optional: []
         };
+    }
+    return {
+            mediaSource: 'window'
+        };
+
 }
+
 
 function startScreen(successCallback, failCallback) {
     trace('using screen constrains: ' + JSON.stringify(screenConstraints));

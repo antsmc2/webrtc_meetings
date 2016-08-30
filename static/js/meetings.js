@@ -30,6 +30,8 @@ var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#status');
 var downloadButton = document.getElementById('downloadRecord');
+var muteAudioButton = document.getElementById('muteAudio');
+var muteVideoButton = document.getElementById('muteVideo');
 downloadButton.disabled = true;
 
 fileInput.onchange = function () {
@@ -593,16 +595,6 @@ function disableChat() {
 }
 
 
-function muteVideo() {
-  if(localStream)
-    localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
-}
-
-function muteAudio() {
-  if(localStream)
-    localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
-}
-
 function sendData() {
   var file = fileInput.files[0];
   var sendId = uniqueId + '.' + Math.floor((1 + Math.random()) * 0x1000000);
@@ -645,7 +637,6 @@ function sendData() {
   sliceFile(0);
 }
 
-
 //thanks to https://chawi3.com/2015/03/03/arraybuffer-to-base64-base64-to-arraybuffer-javascript/
 function arrayBufferToBase64( buffer ) {
     var binary = '';
@@ -665,4 +656,35 @@ function base64ToArrayBuffer(base64) {
         bytes[i] = binary_string.charCodeAt(i);
     }
     return bytes.buffer;
+}
+
+
+function muteVideo() {
+  if(localStream)
+    localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+}
+
+function muteAudio() {
+  if(localStream)
+    localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+}
+
+function toggleMuteVideo() {
+   if(muteVideoButton.textContent.toLowerCase() == 'mute')
+   {
+        muteVideoButton.textContent = 'unmute';
+   }else {
+        muteVideoButton.textContent = 'mute';
+   }
+   muteVideo();
+}
+
+function toggleMuteAudio() {
+   if(muteAudioButton.textContent.toLowerCase() == 'mute')
+   {
+        muteAudioButton.textContent = 'unmute';
+   }else {
+        muteAudioButton.textContent = 'mute';
+   }
+   muteAudio();
 }
