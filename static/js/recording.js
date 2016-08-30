@@ -26,6 +26,13 @@ stream to record independently.
 
 /* globals MediaRecorder */
 
+    // Firefox 1.0+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Chrome 1+
+var isChrome = !!window.chrome && !!window.chrome.webstore;
+var mimeType = isChrome ? 'audio/webm' : 'audio/ogg';
+var fileExt = isChrome ? '.webm' : '.ogg';
+var chromeMediaSource = 'screen';
 var screenStream = null;
 var recordStream = null;
 var mediaSource = new MediaSource();
@@ -89,13 +96,13 @@ function startRecording() {
   acquireRecordStream().then(function(){
       recordedBlobs = [];
       var stream = screenStream === null ? window.stream : screenStream;
-      var options = {mimeType: 'video/webm;codecs=vp9'};
+      var options = {mimeType: mimeType+';codecs=vp9'};
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.log(options.mimeType + ' is not Supported');
-        options = {mimeType: 'video/webm;codecs=vp8'};
+        options = {mimeType: mimeType+';codecs=vp8'};
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.log(options.mimeType + ' is not Supported');
-          options = {mimeType: 'video/webm'};
+          options = {mimeType: mimeType};
           if (!MediaRecorder.isTypeSupported(options.mimeType)) {
             console.log(options.mimeType + ' is not Supported');
             options = {mimeType: ''};
@@ -127,14 +134,14 @@ function stopRecording() {
 }
 
 function download() {
-  var blob = new Blob(recordedBlobs, {type: 'video/webm'});
+  var blob = new Blob(recordedBlobs, {type: mimeType});
   var url = window.URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
   if(!uniqueId)
      var uniqueId = '';
-  a.download = 'screen-' + new Date() + uniqueId + '.webm';
+  a.download = 'screen-' + new Date() + uniqueId + fileExt;
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
@@ -143,36 +150,43 @@ function download() {
   }, 100);
 }
 
-var screenConstraints = null;
+var chromeMediaSource = 'screen';
 
-if(window.navigator.userAgent.match('Chrome')) {
-    //boldly assuming Chrome 34+ and that chrome extension has been installed
-     screenConstraints = {
-            video: {
-                mandatory: {
-                    maxWidth: window.screen.width,
-                    maxHeight: window.screen.height,
-                    chromeMediaSource: 'window'
-                }
-            },
-            audio: true
-    };
-} else if (window.navigator.userAgent.match('Firefox')) {
-    screenConstraints = {
-            video: {
-                mozMediaSource: 'window',
-                mediaSource: 'window'
-            },
-            audio: true
+var screenConstraints = {
+//  video: getScreenConstraints(),
+  audio: true
+};
+
+
+
+// this function explains how to use above methods/objects
+function getScreenConstraints() {
+   if(isFirefox){
+        return {
+            mozMediaSource: 'window',
+            mediaSource: 'window'
         };
-} else {
-    screenConstraints = {
-            video: {
-                mediaSource: 'window'
+    }
+
+    // this statement defines getUserMedia constraints
+    // that will be used to capture content of screen
+    if(isChrome) {
+        return {
+            mandatory: {
+                chromeMediaSource: chromeMediaSource,
+                maxWidth: window.screen.width,
+                maxHeight: window.screen.height
             },
-            audio: true
+            optional: []
         };
+    }
+    return {
+            mediaSource: 'screen'
+        };
+
 }
+
+
 
 function startScreen(successCallback, failCallback) {
     trace('using screen constrains: ' + JSON.stringify(screenConstraints));
