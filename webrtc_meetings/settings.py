@@ -155,6 +155,8 @@ RQ_QUEUES = {
     },
 }
 
+HTTP_AUTH_REALM = 'meeting-room'
+
 ROOM_KEY_FORMAT = 'room-%(room_id)s'
 
 ICE_SERVERS = [
@@ -162,10 +164,10 @@ ICE_SERVERS = [
     'urls': 'stun:stun.l.google.com:19302',
   },
   {
-	'urls':'stun:202.153.34.169:8002?transport=tcp'
+	'urls':'stun:202.153.34.169:8002?transport=tcp',
   },
   {
-	'urls':'stun:global.stun.twilio.com:3478?transport=udp'
+	'urls':'stun:global.stun.twilio.com:3478?transport=udp',
   },
   {
     'urls' : 'turn:202.153.34.169:8002?transport=tcp',
@@ -177,4 +179,4 @@ ICE_SERVERS = [
     'credential': 'lN48+q3dzIvVFTIojLICy53W0lo9vujIoBcLExzS6pI=',
     'username': '70cfe39ec1b0922d41f49812f110383f31c7d0e861b27e40d58e5a1b453f4c01'
   }
-  ];
+];

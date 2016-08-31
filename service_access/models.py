@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from model_base.base import Base
 
+
 # Create your models here.
 class ServiceUser(Base):
     '''
