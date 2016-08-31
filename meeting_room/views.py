@@ -1,5 +1,6 @@
 import redis
 import json
+from channels import Channel
 from django.shortcuts import render, get_object_or_404, render_to_response, RequestContext
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -8,12 +9,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.serializers.json import DjangoJSONEncoder
 from .models import Meeting
-from service_access.models import ServiceUser
 from webrtc_meetings.routing import store as attendance_register
 from webrtc_meetings.routing import ONLINE
 from model_base.attendant import Attendant
 from utils.helpers import get_client_ip
 from utils.logger import glogger
+from utils.helpers import login_required
 
 
 # Create your views here.
@@ -41,20 +42,33 @@ def online_attendants(request):
     return HttpResponse(json.dumps(attendants), content_type='application/json')
 
 
-def create_room(request):
+@login_required
+def create_room(request, user):
     try:
-        ip, username, password = get_client_ip(request), request.GET['username'], request.GET['password']
-        glogger.info('received request: %s, %s, %s' % (ip, username, password))
-        duration = int(request.GET['duration'])
-        timezone_requested = request.POST.get('timezone', settings.TIME_ZONE)
-        user = User.objects.get(username=username)
-        if ServiceUser.exists(ip, user, password):
-            meeting = Meeting.objects.create(creator=user, timezone=timezone_requested, activation_date=timezone.now(),
-                                             duration=duration)
-            meeting_url = meeting.meeting_url()     # to generate the meeting url
-            return HttpResponse(json.dumps({'creator': username, 'start_date': meeting.activation_date,
-                                            'duration': meeting.duration, 'meeting_url': meeting_url},
-                                           cls=DjangoJSONEncoder))
+        request_data = request.POST if request.method == 'POST' else request.GET
+        duration = int(request_data['duration'])
+        timezone_requested = request_data.get('timezone', settings.TIME_ZONE)
+        meeting = Meeting.objects.create(creator=user, timezone=timezone_requested, activation_date=timezone.now(),
+                                         duration=duration)
+        meeting_url = meeting.meeting_url()     # to generate the meeting url
+        return HttpResponse(json.dumps({'creator': user.username, 'start_date': meeting.activation_date,
+                                        'duration': meeting.duration, 'meeting_url': meeting_url},
+                                       cls=DjangoJSONEncoder))
     except Exception, ex:
         raise ex
     return HttpResponseNotFound()   # generally give page not found for other failures
+
+
+@login_required
+def notify(request, user, ws_id):
+    '''
+    This function is volatile.It is only returns content when successful
+    :param request:
+    :param user:
+    :param ws_id:
+    :return:
+    '''
+    request_data = request.POST if request.method == 'POST' else request.GET
+    notification_string = json.dumps(request_data)
+    Channel(ws_id).send({'text': notification_string})
+    return HttpResponse(notification_string)

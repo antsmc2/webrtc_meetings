@@ -67,7 +67,7 @@ def mark_absent(message):
 
 def get_request_params(request_string):
     params = {}
-    for key, value in parse_qs(request_string):
+    for key, value in parse_qs(request_string).items():
         params[key] = value[0]
     return params
 

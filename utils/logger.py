@@ -17,7 +17,7 @@ mlogger.addHandler(mhandler)
 mlogger.setLevel(log_level)
 
 
-#MENU SESSION LOGGER
+#WEB SOCKET SESSION LOGGER
 LOG_FILE = os.path.join(BASE_DIR, 'logs', 'websocket.log')
 whandler = handlers.TimedRotatingFileHandler(LOG_FILE, when=LOG_ROTATE)
 whandler.setFormatter(formatter)
@@ -32,3 +32,11 @@ ghandler.setFormatter(formatter)
 glogger = logging.getLogger("general")
 glogger.addHandler(ghandler)
 glogger.setLevel(log_level)
+
+#AUTH SESSION LOGGER
+LOG_FILE = os.path.join(BASE_DIR, 'logs', 'service_auth.log')
+sahandler = handlers.TimedRotatingFileHandler(LOG_FILE, when=LOG_ROTATE)
+sahandler.setFormatter(formatter)
+salogger = logging.getLogger("service_auth")
+salogger.addHandler(sahandler)
+salogger.setLevel(log_level)
