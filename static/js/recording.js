@@ -26,12 +26,26 @@ stream to record independently.
 
 /* globals MediaRecorder */
 
+    // Firefox 1.0+
+var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Chrome 1+
+var isChrome = !!window.chrome && !!window.chrome.webstore;
+var audioMimeType = isChrome ? 'audio/webm' : 'audio/ogg';
+var audioFileExt = isChrome ? '.webm' : '.ogg';
+var videoMimeType = 'video/webm' ;
+var videoFileExt = '.webm';
+var chromeMediaSource = 'screen';
 var screenStream = null;
-var recordStream = null;
-var mediaSource = new MediaSource();
-mediaSource.addEventListener('sourceopen', handleSourceOpen, false);
-var mediaRecorder;
-var recordedBlobs;
+var audioRecordStream = null;
+var videoRecordStream = null;
+var audioMediaSource = new MediaSource();
+audioMediaSource.addEventListener('sourceopen', handleAudioSourceOpen, false);
+var audioMediaSource = new MediaSource();
+videoMediaSource.addEventListener('sourceopen', handleVideoSourceOpen, false);
+var audioMediaRecorder;
+var videoMediaRecorder;
+var recordedAudioBlobs;
+var recordedVideoBlobs;
 var sourceBuffer;
 
 var recordButton = document.getElementById('record');
@@ -39,17 +53,21 @@ var downloadButton = document.getElementById('downloadRecord');
 recordButton.onclick = toggleRecording;
 downloadButton.onclick = download;
 
-
 function handleError(error) {
   console.log('navigator.getUserMedia error: ', error);
 }
 
-function handleSourceOpen(event) {
+function handleVideoSourceOpen(event) {
   console.log('MediaSource opened');
   sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
   console.log('Source buffer: ', sourceBuffer);
 }
 
+function handleAudioSourceOpen(event) {
+  console.log('MediaSource opened');
+  sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+  console.log('Source buffer: ', sourceBuffer);
+}
 
 
 function handleDataAvailable(event) {
@@ -89,13 +107,13 @@ function startRecording() {
   acquireRecordStream().then(function(){
       recordedBlobs = [];
       var stream = screenStream === null ? window.stream : screenStream;
-      var options = {mimeType: 'video/webm;codecs=vp9'};
+      var options = {mimeType: mimeType+';codecs=vp9'};
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.log(options.mimeType + ' is not Supported');
-        options = {mimeType: 'video/webm;codecs=vp8'};
+        options = {mimeType: mimeType+';codecs=vp8'};
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.log(options.mimeType + ' is not Supported');
-          options = {mimeType: 'video/webm'};
+          options = {mimeType: mimeType};
           if (!MediaRecorder.isTypeSupported(options.mimeType)) {
             console.log(options.mimeType + ' is not Supported');
             options = {mimeType: ''};
@@ -127,14 +145,14 @@ function stopRecording() {
 }
 
 function download() {
-  var blob = new Blob(recordedBlobs, {type: 'video/webm'});
+  var blob = new Blob(recordedBlobs, {type: mimeType});
   var url = window.URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
   if(!uniqueId)
      var uniqueId = '';
-  a.download = 'screen-' + new Date() + uniqueId + '.webm';
+  a.download = 'screen-' + new Date() + uniqueId + fileExt;
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
@@ -147,10 +165,7 @@ function download() {
 var isFirefox = typeof InstallTrigger !== 'undefined';
     // Chrome 1+
 var isChrome = !!window.chrome && !!window.chrome.webstore;
-var chromeMediaSource = 'screen';
-
 var screenConstraints = {
-  //video: getScreenConstraints(),//disabling for now
   audio: true
 };
 
@@ -178,11 +193,10 @@ function getScreenConstraints() {
         };
     }
     return {
-            mediaSource: 'window'
+            mediaSource: 'screen'
         };
 
 }
-
 
 function startScreen(successCallback, failCallback) {
     trace('using screen constrains: ' + JSON.stringify(screenConstraints));

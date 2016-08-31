@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'django_rq_dashboard',
     'channels',
     'timezone_field',
+    'service_access',
     'meeting_room',
 )
 

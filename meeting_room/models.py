@@ -5,7 +5,9 @@ from timezone_field import TimeZoneField
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Q
 from model_base.base import Base
+from datetime import datetime
 
 
 # Create your models here.
@@ -30,8 +32,12 @@ class Meeting(Base):
             For now, only until there is an it's only when there is an end date.
         :return:
         '''
-        #import pdb; pdb.set_trace()
-        if self.activation_date < timezone.now():
+        if self.activation_date < timezone.localtime(timezone.now(), timezone=self.timezone):
             self._setup()
             if self.room_id:
                 return reverse('join_meeting', kwargs={'room_id': self.room_id})
+
+    @classmethod
+    def get_meeting(cls, room_id):
+        #throws cls.DoesNotExist
+        return cls.objects.get(Q(room_id=room_id), Q(end_date__isnull=True)| Q(end_date__lte=timezone.now()))

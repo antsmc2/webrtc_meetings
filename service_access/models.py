@@ -9,7 +9,7 @@ class ServiceUser(Base):
         This is used to define users with API access to manage meeting resources.
         Possibly, in the future, there shall be mechanism to define API specific permissions
     '''
-    ip = models.IPAddressField(db_index=True)
+    ip = models.GenericIPAddressField(db_index=True)
     user = models.ForeignKey(User, related_name='service_access', db_index=True)
     password = models.CharField(max_length=200)
 

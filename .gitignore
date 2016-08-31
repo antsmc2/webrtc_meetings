@@ -50,3 +50,6 @@ logs/*log*
 
 #db file
 *.sqlite3
+
+#exclude migrations
+*/migrations/*

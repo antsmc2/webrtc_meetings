@@ -157,16 +157,14 @@ function sendThroughServer(msg) {
   connection.send(msgJSON);
 }
 
-function connect(path, ice_uri) {
+function connect(ice_uri) {
   var scheme = "ws";
 
   // If this is an HTTPS connection, we have to use a secure WebSocket
   // connection too, so add another "s" to the scheme.
+  serverUrl = document.URL;
+  serverUrl =  serverUrl.replace('http', scheme);
   var req_protocol = document.location.protocol;
-  if (req_protocol === "https:") {
-      scheme += "s";
-  }
-  serverUrl = scheme + "://" + myHostname + ':' + myPort + path;
   initialize(serverUrl);
   ice_uri = req_protocol + "//" + myHostname + ':' + myPort + ice_uri;
   var xhttp = new XMLHttpRequest();
