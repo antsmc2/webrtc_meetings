@@ -32,10 +32,13 @@ def login_required(func):
             if authmeth.lower() == 'basic':
                 auth = auth.strip().decode('base64')
                 username, password = auth.split(':',1)
-                user = User.objects.get(username=username)
-                salogger.info('received request: %s, %s, %s' % (ip, username, password))
-                if ServiceUser.exists(ip, user, password):
-                    return func(request, user, *args, **kwargs)
+                try:
+                    user = User.objects.get(username=username)
+                    salogger.info('received request: %s, %s, %s' % (ip, username, password))
+                    if ServiceUser.exists(ip, user, password):
+                        return func(request, user, *args, **kwargs)
+                except User.DoesNotExist:
+                    pass
         return _challenge()
     return _decorator
 
