@@ -1,6 +1,6 @@
 #this file needs to improve the way it restarts the service
-file="./supervisord.pid"
-if [-f "$file"]
+#file="./supervisord.pid"
+if [-f ./supervisord.pid]
 then
     pid=$(cat $file)
     echo "found supervisor process: $pid"

@@ -599,25 +599,20 @@ function handleReceivedBinaryMessage(msg) {
      receiveProgress.max = msg['fileSize'];
      downloadAnchor.href = '';
      downloadAnchor.download = '';
-     downloadAnchor.textContent = '';
-  }
-  receivedFiles[msg['sendId']]['payload'].push(msg['payload']);
-  receivedFiles[msg['sendId']]['size'] += msg['payload'].byteLength;
-  var receivedSize = receivedFiles[msg['sendId']]['size'];
-  receiveProgress.value = receivedFiles[msg['sendId']]['size'];
-
-  // we are assuming that our signaling protocol told
-  // about the expected file size (and name, hash, etc).
-  if (receivedSize === msg['fileSize']) {
-    var received = new window.Blob(receivedFiles[msg['sendId']]['payload']);
-
-    downloadAnchor.href = URL.createObjectURL(received);
-    downloadAnchor.download = msg['fileName'];
-    downloadAnchor.textContent =
-      'Click to download \'' + msg['fileName'] + '\' (' + msg['fileSize'] + ' bytes)';
-    downloadAnchor.style.display = 'block';
+     downloadAnchor.textContent = 'Click to download \'' + msg['fileName'] + '\' (' + formatBytes(msg['fileSize']) + ')';
+     downloadAnchor.style.display = 'block';
 
   }
+}
+
+//Apercu@http://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
+function formatBytes(bytes,decimals) {
+   if(bytes == 0) return '0 Byte';
+   var k = 1024;
+   var dm = decimals + 1 || 3;
+   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+   var i = Math.floor(Math.log(bytes) / Math.log(k));
+   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 
