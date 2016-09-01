@@ -40,7 +40,7 @@ var audioRecordStream = null;
 var videoRecordStream = null;
 var audioMediaSource = new MediaSource();
 audioMediaSource.addEventListener('sourceopen', handleAudioSourceOpen, false);
-var audioMediaSource = new MediaSource();
+var videoMediaSource = new MediaSource();
 videoMediaSource.addEventListener('sourceopen', handleVideoSourceOpen, false);
 var audioMediaRecorder;
 var videoMediaRecorder;
@@ -48,8 +48,8 @@ var recordedAudioBlobs;
 var recordedVideoBlobs;
 var sourceBuffer;
 
-var recordButton = document.getElementById('record');
-var downloadButton = document.getElementById('downloadRecord');
+var recordButton = document.getElementById('recordButton');
+var downloadButton = document.getElementById('downloadRecordButton');
 recordButton.onclick = toggleRecording;
 downloadButton.onclick = download;
 
@@ -59,25 +59,35 @@ function handleError(error) {
 
 function handleVideoSourceOpen(event) {
   console.log('MediaSource opened');
-  sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+  sourceBuffer = videoMediaSource.addSourceBuffer('video/webm; codecs="vp8"');
   console.log('Source buffer: ', sourceBuffer);
 }
 
 function handleAudioSourceOpen(event) {
   console.log('MediaSource opened');
-  sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vp8"');
+  sourceBuffer = audioMediaSource.addSourceBuffer('video/webm; codecs="vp8"');
   console.log('Source buffer: ', sourceBuffer);
 }
 
 
-function handleDataAvailable(event) {
+function handleAudioDataAvailable(event) {
   if (event.data && event.data.size > 0) {
-    recordedBlobs.push(event.data);
+    recordedAudioBlobs.push(event.data);
   }
 }
 
-function handleStop(event) {
-  console.log('Recorder stopped: ', event);
+function handleAudioStop(event) {
+  console.log('Audio Recorder stopped: ', event);
+}
+
+function handleVideoDataAvailable(event) {
+  if (event.data && event.data.size > 0) {
+    recordedAudioBlobs.push(event.data);
+  }
+}
+
+function handleVideoStop(event) {
+  console.log('Audio Recorder stopped: ', event);
 }
 
 function toggleRecording() {
@@ -92,12 +102,10 @@ function toggleRecording() {
 
 function acquireRecordStream() {
     return new Promise(function(resolve, reject) {
-      startScreen(function(stream){
-        recordStream = stream;
+      startScreenRecording(function(){
         resolve();
       },function() {
-        recordStream = window.stream;
-        resolve();
+        reject();
       });
     });
 }
@@ -105,15 +113,21 @@ function acquireRecordStream() {
 // The nested try blocks will be simplified when Chrome 47 moves to Stable
 function startRecording() {
   acquireRecordStream().then(function(){
-      recordedBlobs = [];
-      var stream = screenStream === null ? window.stream : screenStream;
-      var options = {mimeType: mimeType+';codecs=vp9'};
+        recordAudio();
+        if(videoRecordStream)
+            recordVideo();
+    });
+}
+
+function recordVideo() {
+      recordedVideoBlobs = [];
+      var options = {mimeType: videoMimeType+';codecs=vp9'};
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.log(options.mimeType + ' is not Supported');
-        options = {mimeType: mimeType+';codecs=vp8'};
+        options = {mimeType: videoMimeType+';codecs=vp8'};
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.log(options.mimeType + ' is not Supported');
-          options = {mimeType: mimeType};
+          options = {mimeType: videoMimeType};
           if (!MediaRecorder.isTypeSupported(options.mimeType)) {
             console.log(options.mimeType + ' is not Supported');
             options = {mimeType: ''};
@@ -121,38 +135,73 @@ function startRecording() {
         }
       }
       try {
-        mediaRecorder = new MediaRecorder(stream, options);
+        videoMediaRecorder = new MediaRecorder(videoRecordStream, options);
       } catch (e) {
         console.error('Exception while creating MediaRecorder: ' + e);
         alert('Exception while creating MediaRecorder: '
           + e + '. mimeType: ' + options.mimeType);
         return;
       }
-      console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+      console.log('Created MediaRecorder', videoMediaRecorder, 'with options', options);
       recordButton.textContent = 'Stop Recording';
       downloadButton.disabled = true;
-      mediaRecorder.onstop = handleStop;
-      mediaRecorder.ondataavailable = handleDataAvailable;
-      mediaRecorder.start(10); // collect 10ms of data
-      console.log('MediaRecorder started', mediaRecorder);
-    });
+      videoMediaRecorder.onstop = handleVideoStop;
+      videoMediaRecorder.ondataavailable = handleVideoDataAvailable;
+      videoMediaRecorder.start(10);
+      console.log('Video MediaRecorder started', videoMediaRecorder);
+}
+
+function recordAudio() {
+      recordedAudioBlobs = [];
+      var options = {mimeType: audioMimeType+';codecs=FLAC'};
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.log(options.mimeType + ' is not Supported');
+          options = {mimeType: ''};
+      }
+      try {
+        audioMediaRecorder = new MediaRecorder(audioRecordStream, options);
+      } catch (e) {
+        console.error('Exception while creating MediaRecorder: ' + e);
+        alert('Exception while creating MediaRecorder: '
+          + e + '. mimeType: ' + options.mimeType);
+        return;
+      }
+      console.log('Created MediaRecorder', audioMediaRecorder, 'with options', options);
+      recordButton.textContent = 'Stop Recording';
+      downloadButton.disabled = true;
+      audioMediaRecorder.onstop = handleAudioStop;
+      audioMediaRecorder.ondataavailable = handleAudioDataAvailable;
+      audioMediaRecorder.start(10);
+      console.log('Audio MediaRecorder started', audioMediaRecorder);
 }
 
 function stopRecording() {
-  mediaRecorder.stop();
-  console.log('Recorded Blobs: ', recordedBlobs);
-  recordStream = null;
+  audioMediaRecorder.stop();
+  if(videoMediaRecorder)
+    videoMediaRecorder.stop();
+  console.log('audio Recorded Blobs: ', recordedAudioBlobs);
+  console.log('video Recorded Blobs: ', recordedVideoBlobs);
+  recordButton.textContent = 'Start Recording';
+  downloadButton.disabled = false;
+  audioRecordStream = null;
+  videoRecordStream = null;
 }
 
 function download() {
-  var blob = new Blob(recordedBlobs, {type: mimeType});
+    downloadAudio();
+    if(recordedVideoBlobs)
+        downloadVideo();
+}
+
+function downloadVideo() {
+  var blob = new Blob(recordedVideoBlobs, {type: videoMimeType});
   var url = window.URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.style.display = 'none';
   a.href = url;
   if(!uniqueId)
      var uniqueId = '';
-  a.download = 'screen-' + new Date() + uniqueId + fileExt;
+  a.download = 'video-screen-' + new Date() + uniqueId + videoFileExt;
   document.body.appendChild(a);
   a.click();
   setTimeout(function() {
@@ -160,6 +209,24 @@ function download() {
     window.URL.revokeObjectURL(url);
   }, 100);
 }
+
+function downloadAudio() {
+  var blob = new Blob(recordedAudioBlobs, {type: audioMimeType});
+  var url = window.URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  if(!uniqueId)
+     var uniqueId = '';
+  a.download = 'audio-screen-' + new Date() + uniqueId + audioFileExt;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 100);
+}
+
 
     // Firefox 1.0+
 var isFirefox = typeof InstallTrigger !== 'undefined';
@@ -198,16 +265,21 @@ function getScreenConstraints() {
 
 }
 
-function startScreen(successCallback, failCallback) {
+function startScreenRecording(successCallback, failCallback) {
     trace('using screen constrains: ' + JSON.stringify(screenConstraints));
-    navigator.mediaDevices.getUserMedia(screenConstraints).then(function(stream){
-        screenStream = stream;
-        if(successCallback)
-            successCallback(stream);
+    navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream){
+        audioRecordStream = stream;
+        navigator.mediaDevices.getUserMedia({video: getScreenConstraints()}).then(function(stream){
+            videoRecordStream = stream;
+            successCallback();  // attempt to get both audio/video
+        }).catch(function(e) {
+            trace('unable to screen: ' + e.name);
+            successCallback();  // its okay  if we have just audio
+          });
+
     }).catch(function(e) {
-    trace('getUserMedia() error: ' + e.name);
-    if(failCallback)
-        failCallback(stream);
+    trace('unable to get audio error: ' + e.name);
+        failCallback()  //fail only if audio fails
   });
 
 }

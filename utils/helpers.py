@@ -1,9 +1,10 @@
 __author__ = 'anthony <antsmc2@gmail.com>'
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.conf import settings
 from service_access.models import ServiceUser
 from utils.logger import salogger
+import requests
 
 
 def get_client_ip(request):
@@ -41,4 +42,3 @@ def login_required(func):
                     pass
         return _challenge()
     return _decorator
-
