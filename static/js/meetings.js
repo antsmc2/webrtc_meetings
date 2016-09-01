@@ -370,7 +370,6 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
   switch(peerConnection.iceConnectionState) {
     case "closed":
     case "failed":
-      cleanPeer(peer_id);
     //case "disconnected": removing this becos some networks might still recover
       //updateChat({text: peer_id + ' disconnected.'});
       //closeVideoCall();
@@ -384,6 +383,7 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
 }
 
 function cleanPeer(peer_id) {
+    trace('cleaning up partner');
     delete remoteVideos[peer_id];
     delete peers[peer_id];
     document.getElementById(peer_id).remove();
@@ -526,7 +526,7 @@ function setUpDataChannel(peer_id) {
 
   dataChannel.onclose = function () {
     trace(peer_id + ": The Data Channel is Closed");
-    disableChat();
+    cleanPeer(peer_id);
   };
   trace('done setting up channel: '+ peer_id);
 }
