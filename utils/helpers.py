@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from service_access.models import ServiceUser
 from utils.logger import salogger
-import requests
 
 
 def get_client_ip(request):
