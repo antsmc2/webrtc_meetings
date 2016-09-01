@@ -1,4 +1,3 @@
-import redis
 import json
 from channels import Channel
 from django.shortcuts import render, get_object_or_404, render_to_response, RequestContext
@@ -70,5 +69,8 @@ def notify(request, user, ws_id):
     '''
     request_data = request.POST if request.method == 'POST' else request.GET
     notification_string = json.dumps(request_data)
-    Channel(ws_id).send({'text': notification_string})
-    return HttpResponse(notification_string)
+    if attendance_register.hexists(ONLINE, ws_id):
+        Channel(ws_id).send({'text': notification_string})
+        return HttpResponse(notification_string)
+    else:
+        return HttpResponseNotFound(settings.WS_OFFLINE_NOTICE)
