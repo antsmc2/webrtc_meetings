@@ -232,7 +232,7 @@ function downloadAudio() {
 var isFirefox = typeof InstallTrigger !== 'undefined';
     // Chrome 1+
 var isChrome = !!window.chrome && !!window.chrome.webstore;
-var screenConstraints = {
+var audioConstraints = {
   audio: true
 };
 
@@ -266,7 +266,7 @@ function getScreenConstraints() {
 }
 
 function startScreenRecording(successCallback, failCallback) {
-    trace('using screen constrains: ' + JSON.stringify(screenConstraints));
+    trace('using audio constraints: ' + JSON.stringify(audioConstraints));
     navigator.mediaDevices.getUserMedia({audio: true}).then(function(stream){
         audioRecordStream = stream;
         navigator.mediaDevices.getUserMedia({video: getScreenConstraints()}).then(function(stream){
