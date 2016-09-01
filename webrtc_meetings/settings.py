@@ -156,6 +156,7 @@ RQ_QUEUES = {
 }
 
 HTTP_AUTH_REALM = 'meeting-room'
+WS_OFFLINE_NOTICE = 'OFFLINE'
 
 ROOM_KEY_FORMAT = 'room-%(room_id)s'
 

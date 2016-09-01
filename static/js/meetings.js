@@ -298,6 +298,21 @@ function makeOrGetPeer(id) {
   peerConnection.onaddstream = function(e) {
         gotRemoteStream(e, id);
   }
+/**
+  disabling this for now
+  peerConnection.onremovestream = function(e) {
+        trace('removed stream: ' + id);
+  }
+ */
+  peerConnection.onsignalingstatechange = function(e) {
+    var state = peers[id].signalingState;
+    trace(id + ' state changed to ' + state);
+    switch(state){
+        case "closed":
+            handleGuestLeft(id);
+            break;
+    }
+  }
   peers[id] = peerConnection;
   return peerConnection;
 }
@@ -313,6 +328,7 @@ function handleGuest(peer_id) {
 }
 
 function handleGuestLeft(peer_id) {
+    trace(peer_id + ' left! cleaning up...');
     delete peers[peer_id];
     videoContainer.removeChild(remoteVideos[peer_id]);
     delete remoteVideos[peer_id];
@@ -370,7 +386,6 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
   switch(peerConnection.iceConnectionState) {
     case "closed":
     case "failed":
-      cleanPeer(peer_id);
     //case "disconnected": removing this becos some networks might still recover
       //updateChat({text: peer_id + ' disconnected.'});
       //closeVideoCall();
@@ -383,11 +398,6 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
   }
 }
 
-function cleanPeer(peer_id) {
-    delete remoteVideos[peer_id];
-    delete peers[peer_id];
-    document.getElementById(peer_id).remove();
-}
 
 function onAddIceCandidateSuccess(peer_id) {
   trace(peer_id + ' addIceCandidate success');
@@ -526,7 +536,6 @@ function setUpDataChannel(peer_id) {
 
   dataChannel.onclose = function () {
     trace(peer_id + ": The Data Channel is Closed");
-    disableChat();
   };
   trace('done setting up channel: '+ peer_id);
 }
