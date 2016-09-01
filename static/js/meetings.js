@@ -29,10 +29,11 @@ var downloadAnchor = document.querySelector('a#download');
 var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#status');
-var downloadButton = document.getElementById('downloadRecord');
 var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
-downloadButton.disabled = true;
+muteVideoButton.onclick = toggleMuteVideo;
+muteAudioButton.onclick = toggleMuteAudio;
+
 
 fileInput.onchange = function () {
     sendData();
@@ -269,7 +270,6 @@ function gotLocalStream(stream) {
   localVideo.muted = "muted";
   localStream = stream;
   window.stream = localStream;
-  downloadButton.disabled = false;
   trace('done setting local stream');
 }
 
@@ -668,21 +668,21 @@ function muteAudio() {
 }
 
 function toggleMuteVideo() {
-   if(muteVideoButton.textContent.toLowerCase() == 'mute')
+   if(muteVideoButton.textContent.toLowerCase() == 'mute video')
    {
-        muteVideoButton.textContent = 'unmute';
+        muteVideoButton.textContent = 'Unmute Video';
    }else {
-        muteVideoButton.textContent = 'mute';
+        muteVideoButton.textContent = 'Mute Video';
    }
    muteVideo();
 }
 
 function toggleMuteAudio() {
-   if(muteAudioButton.textContent.toLowerCase() == 'mute')
+   if(muteAudioButton.textContent.toLowerCase() == 'mute audio')
    {
-        muteAudioButton.textContent = 'unmute';
+        muteAudioButton.textContent = 'Unmute Audio';
    }else {
-        muteAudioButton.textContent = 'mute';
+        muteAudioButton.textContent = 'Mute Audio';
    }
    muteAudio();
 }
