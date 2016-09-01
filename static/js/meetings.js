@@ -140,8 +140,7 @@ function gotRemoteStream(e, peer_id) {
   remoteVideo.src = window.URL.createObjectURL(e.stream);
   remoteVideo.id = peer_id;
   remoteVideo.autoplay = true;
-  videoContainer.appendChild(remoteVideo);
-  remoteVideos[peer_id] = remoteVideo;
+  attachRemoteVideo(peer_id, remoteVideo);
   trace('received remote stream from: ' + peer_id);
 }
 
@@ -330,9 +329,19 @@ function handleGuest(peer_id) {
 function handleGuestLeft(peer_id) {
     trace(peer_id + ' left! cleaning up...');
     delete peers[peer_id];
+    removeRemoteVideo(peer_id);
+}
+
+function attachRemoteVideo(peer_id, remoteVideo) {
+    videoContainer.appendChild(remoteVideo);
+    remoteVideos[peer_id] = remoteVideo;
+}
+
+function removeRemoteVideo(peer_id) {
     videoContainer.removeChild(remoteVideos[peer_id]);
     delete remoteVideos[peer_id];
 }
+
 
 function handleVideoAnswerMsg(msg) {
   var peer_id = msg.name;

@@ -1,92 +1,710 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{title}}</title>
-    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<html style="height: 100%;"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="utf-8">
+  <title>{{meeting.description}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!--[if lte IE 7]>
+  <script src="javascript/lte-ie7.js"></script><![endif]-->
+   
+   
+   <link data-require="bootstrap@*" data-semver="3.2.0" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+    
+    
+    
+  <script data-require="angular.js@*" data-semver="1.3.6" src="https://code.angularjs.org/1.3.6/angular.js"></script>
+  <script data-require="jquery@*" data-semver="2.1.1" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="assets/style.css" />
+  <script src="assets/script.js"></script>
+  
+  <link href="assets/myth.css" media="all" rel="stylesheet" type="text/css">
+    <link href="assets/separatedcs.css" media="all" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    @keyframes resizeanim { from { opacity: 0; } to { opacity: 0; } } .resize-triggers { animation: 1ms resizeanim; visibility: hidden; opacity: 0; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: " "; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }
+    
+    .clroom-presenter-signal2 {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 38px;
+    left: 463px;
+	}
+	
+	 .clroom-presenter-signal3 {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 38px;
+    left: 419px;
+	}
+	
+	.hangup {
+    background: #0681ff none repeat scroll 0 0;
+    box-sizing: border-box;
+    display: block;
+    height: 38px;
+    padding: 9px 0 0;
+    width: 38px;
+}
+    h1,h2,h3,h4,h5,h6 {
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+h5 {
+	font-size: 12%;
+	color: #FFF;
+}
+    </style>
+    
+
 </head>
-<body>
-    <div id="main">
-        <section id="constraints">
-        <div id="getUserMedia">
-        <div class="input">
-          <h2>Camera settings</h2>
-          <div id="minWidth">
-            <label>Min width <span>300</span>px:</label>
-            <input type="range" min="0" max="1920" value="300">
-          </div>
-          <div id="maxWidth">
-            <label>Max width <span>640</span>px:</label>
-            <input type="range" min="0" max="1920" value="640">
-          </div>
-          <div id="minHeight">
-            <label>Min height <span>200</span>px:</label>
-            <input type="range" min="0" max="1080" value="200">
-          </div>
-          <div id="maxHeight">
-            <label>Max height <span>480</span>px:</label>
-            <input type="range" min="0" max="1080" value="480">
-          </div>
-          <div id="framerate">
-            <label>Frame rate <span>20</span>fps:</label>
-            <input type="range" min="0" max="60" value="20">
-          </div>
-        </div>
-        <div id="getUserMediaConstraints" class="output"></div>
-      </div>
 
-    </section>
-        <div id="webtrc">
-            <div id="video-settings" class="video">
-                <div id="bandwidth-setting"></div>
-                <div id="toggle-audio"></div>
-                <div id="toggle-video"></div>
-                <div id="record-call"></div>
-            </div>
-            <div id="all-video">
-                <div id="myVideoContainer"></div>
-                <div id="videoContainer" class="video">
-                </div>
-                <div id="chat-container" class="chat">
-
-                </div>
-            </div>
-            <div id="file-share" class="file-share">
-                <form id="fileInfo">
-                    <input type="file" id="fileInput" name="files"/>
-                </form>
-                <div class="progress">
-                    <div class="label">Send progress: </div>
-                    <progress id="sendProgress" max="0" value="0"></progress>
-                </div>
-                  <div id="downloads">
-                      <div class="progress">
-                        <div class="label">Receive progress: </div>
-                        <progress id="receiveProgress" max="0" value="0"></progress>
-                      </div>
-                      <div id="bitrate"></div>
-                      <a id="download"></a>
-                      <span id="status"></span>
-                  </div>
-                  <div id="">
-                      <button id="muteAudio">Mute Audio</button>
-                      <button id="muteVideo">Mute Video</button>
-                  </div>
-                  <div id="recordings">
-                      <div>
-                          <button id="recordButton">Start Recording</button>
-                          <button id="downloadRecordButton" disabled="disabled">Download</button>
-                      </div>
-                  </div>
-            </div>
-        </div>
+<body style="position: relative; min-height: 100%; top: 0px; margin-top: 0px;" ng-app="switchdemo">
+<div class="window" data-title="Your Cam" data-width="220" id="myVideoContainer">
+ </div>
+    <div id="room-body">
+  <a href="javascript:void(0);" id="change-separate-chat-role" class="close"></a><a>
+  <audio style="display: none" id="alert-close-sc">
+    <source src="assets/sc_closedaudio.mp3" type="audio/mpeg">
+  </audio>
+  <audio style="display: none" id="alert-presenter-disconnect">
+    <source src="assets/abc.mp3" type="audio/mpeg">
+  </audio>
+  <div id="chat_filter" class="popup" style="display: none;">
+    <div class="clroom-chat-filter-title">Mention someone</div>
+    <ul id="chat_filter_list">
+    </ul>
+    <div class="bottom-prong">
+      <div class="prong-dk"></div>
+      <div class="prong-lt"></div>
     </div>
-    <script type="text/javascript" src="{% static "js/common.js" %}"></script>
-    <script type="text/javascript" src="{% static "js/recording.js" %}"></script>
-    <script type="text/javascript" src="{% static "js/meetings.js" %}"></script>
-    <script type="text/javascript">
-        connect('{{ ice_uri }}');
-    </script>
-</body>
-</html>
+  </div>
+  </a><div style="top: 0px;" class="clroom-main"><a></a>
+  <a>
+ 
+    <!--main nav-->
+ 
+    <!-- new room top -->
+    <div style="background-color: #1b2229; border-bottom: 1px solid rgb(223, 225, 228);" class="clroom-header">
+      <!--mask-->
+      <div class="clroom-mask" style="top:0; display:none;"></div>
+      <!--newroom logo--> 
+          <div class="clroom-start-trial-no-background">
+          </div>
+      <ul class="clroom-nav">
+        
+        <li data-show-as="admin-presenter" style="">
+          <div ng-controller="DemoController" ng-init="init()">
+    <div class="well2">
+      <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" height="20px" width="20px" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve" ng-if="status == true" ng-click="changeStatus();" class="active">
+<g id="Web-cam" fill="#08ef08" >
+	<path d="M44,24.25c0-6.6166992-5.3833008-12-12-12s-12,5.3833008-12,12c0,6.6166,5.3833008,12,12,12S44,30.8666,44,24.25z
+		 M22,24.25c0-5.5142002,4.4857998-10,10-10s10,4.4857998,10,10c0,5.5140991-4.4858017,10-10,10S22,29.7640991,22,24.25z" fill="#ffffff" />
+	<path d="M42.0890999,43.9135017C49.7271996,40.1688995,55,32.3146019,55,23.25c0-12.6822004-10.3179016-23-23-23
+		s-23,10.3177996-23,23c0,9.0646019,5.2728004,16.9188995,12.9109001,20.6635017l-6.5202999,13.9053001
+		c-0.6128006,1.3065987-0.5044003,2.8080978,0.2890997,4.0165977C16.4657993,63.0340996,17.8017006,63.75,19.2534008,63.75
+		h25.4932003c1.4515991,0,2.7875977-0.7159004,3.5732002-1.9141006c0.7939987-1.2089996,0.9023972-2.7104988,0.2896004-4.0170975
+		L42.0890999,43.9135017z M11,23.25c0-11.5796003,9.4204006-21,21-21s21,9.4203997,21,21c0,11.5794983-9.4203987,21-21,21
+		S11,34.8294983,11,23.25z M46.6474991,60.7387009C46.232399,61.3720016,45.5219994,61.75,44.7466011,61.75H19.2534008
+		c-0.7754002,0-1.4858017-0.3779984-1.9014015-1.0117989c-0.4095993-0.6240005-0.4662991-1.3973999-0.1507988-2.0698013
+		L23.7451,44.7118988C26.3092995,45.7015991,29.0911007,46.25,32,46.25s5.6907005-0.5484009,8.2549019-1.5381012
+		l6.5438995,13.956501C47.1142006,59.3408012,47.0575981,60.1142006,46.6474991,60.7387009z" />
+	<circle cx="35" cy="20.25" r="2" />
+	<path d="M33,30.25c0-0.5522995-0.4477997-1-1-1c-3.2886009,0-3.9916992-3.0678997-4.0209999-3.2050991
+		c-0.1128006-0.5381012-0.6371994-0.886301-1.1791992-0.7749004c-0.5410004,0.1107998-0.8901005,0.6385994-0.7798004,1.1800995
+		C26.3589001,28.1103001,28.0449009,31.25,32,31.25C32.5522003,31.25,33,30.8022003,33,30.25z" />
+</g>
+</svg>
+
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px"  version="1.1" id="Layer_1" x="0px" y="0px" viewbox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve"  ng-if="status == false" ng-click="changeStatus();" class="inactive">
+<path id="Webcam-disabled" d="M57.7358665,0.4478199c-0.3740997-0.4062-1.0058975-0.4331-1.4130974-0.0586L48.0715675,7.98032  C43.859169,3.31352,37.7668686,0.37512,30.9999676,0.37512c-12.6821003,0-23,10.3177996-23,23  c0,6.0795002,2.3754997,11.6120014,6.2417002,15.7287006l-7.9189,7.2854004  c-0.4063001,0.3740005-0.4326,1.0063972-0.0585999,1.4130974c0.1973,0.2144012,0.4663,0.3227997,0.7363,0.3227997  c0.2416997,0,0.4843998-0.0873985,0.6767998-0.2641983l7.9955001-7.355999  c1.5681992,1.4048004,3.3288994,2.5976982,5.2381001,3.533699l-6.5201998,13.9053001  c-0.6128006,1.3065987-0.5044003,2.8081017,0.2889996,4.0166016c0.7862005,1.1987,2.1220999,1.9145966,3.5737009,1.9145966  h25.4931984c1.4517021,0,2.7876015-0.7158966,3.5732994-1.9140968c0.7939034-1.2089996,0.9023018-2.7105026,0.2895012-4.0171013  L41.0890694,44.03862c7.6380997-3.7445984,12.9109001-11.5988998,12.9109001-20.6634998  c0-5.1968002-1.7346001-9.9952002-4.6526031-13.8509007L57.677269,1.86092  C58.0834694,1.48692,58.1098671,0.85452,57.7358665,0.4478199z M9.9999676,23.3751202c0-11.5796003,9.4204006-21,21-21  c6.1855984,0,11.7376003,2.7043002,15.5842991,6.9735994l-7.1086998,6.54  c-2.1725006-2.1698999-5.169899-3.5135994-8.4755993-3.5135994c-6.6166992,0-12,5.3832989-12,12  c0,2.9471989,1.0725002,5.6455002,2.8418007,7.7364979l-6.1179008,5.6287003  C12.1857681,33.9800186,9.9999676,28.9334202,9.9999676,23.3751202z M35.7101669,19.3526192  c-0.3495979-0.5829983-0.9813004-0.977499-1.7101974-0.977499c-1.1040001,0-2.0000019,0.8959007-2.0000019,2  c0,0.6688995,0.3321018,1.2579994,0.8369007,1.6210003l-5.5230999,5.0812988  c-0.2352009-0.4811993-0.3250008-0.8612995-0.3348007-0.9074001c-0.1128006-0.5380993-0.6401005-0.8866997-1.1791992-0.7748985  c-0.5410004,0.1107998-0.8901005,0.6385994-0.7797012,1.1800995c0.1086006,0.532299,0.3579006,1.2164001,0.7737999,1.9006996  l-2.4825993,2.2838993c-1.4419003-1.7333984-2.3113003-3.9589996-2.3113003-6.3846989c0-5.5142002,4.4859009-10,10-10  c2.7244015,0,5.1950016,1.0978994,7.0002995,2.8708L35.7101669,19.3526192z M27.0890675,30.0020199  c0.9346008,0.7922001,2.2122002,1.3731003,3.9109001,1.3731003c0.5522995,0,1-0.4477997,1-1c0-0.5522995-0.4477005-1-1-1  c-1.0503998,0-1.8346996-0.3143005-2.419899-0.7446995l10.7050991-9.8488998  c1.0820007,1.5974998,1.7148018,3.5229988,1.7148018,5.5935993c0,5.5140991-4.4858017,9.9999981-10.0000019,9.9999981  c-2.3684006,0-4.5438995-0.8316002-6.2590008-2.2128983L27.0890675,30.0020199z M45.7988663,58.7935181  c0.315403,0.6724014,0.2587013,1.4458008-0.1513977,2.0703011c-0.4150009,0.6333008-1.1254997,1.0112991-1.9009018,1.0112991  H18.2533684c-0.775301,0-1.4857998-0.3779984-1.9013004-1.0117989c-0.4097004-0.6240005-0.4663-1.3973999-0.1508999-2.0698013  l6.5438995-13.9564972c2.5643005,0.9897003,5.3460007,1.5380974,8.2549,1.5380974c2.9089985,0,5.6906986-0.5483971,8.2549-1.5380974  L45.7988663,58.7935181z M51.9999695,23.3751202c0,11.5795002-9.4204025,20.9999981-21.0000019,20.9999981  c-5.3015003,0-10.1359997-1.9902992-13.8353996-5.2424965l6.0924988-5.6052017  c2.0919018,1.7727013,4.7927017,2.8476982,7.7429008,2.8476982c6.6167011,0,12.0000019-5.3832989,12.0000019-11.9999981  c0-2.5923004-0.8347015-4.9883003-2.2376022-6.9524002l7.0907021-6.5235004  C50.4457664,14.3924198,51.9999695,18.7002201,51.9999695,23.3751202z"  fill="#ec0000"  />
+<h1 style="font-size:12px; color:#0CC; text-align:center; padding-top:3px;">Cam</h1>
+</svg>
+
+    </div>
+   
+     </div>
+     </li>
+     
+
+
+
+    
+        <li data-show-as="admin-presenter" style="">
+        <div ng-controller="DemoController" ng-init="init(2)">
+    <div class="well2">
+     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_1" x="0px" y="0px" viewbox="0 0 475.085 475.085" style="enable-background:new 0 0 475.085 475.085;" xml:space="preserve" ng-if="status == true" ng-click="changeStatus();" class="active">
+
+		<path d="M237.541,328.897c25.128,0,46.632-8.946,64.523-26.83c17.888-17.884,26.833-39.399,26.833-64.525V91.365    c0-25.126-8.938-46.632-26.833-64.525C284.173,8.951,262.669,0,237.541,0c-25.125,0-46.632,8.951-64.524,26.84    c-17.893,17.89-26.838,39.399-26.838,64.525v146.177c0,25.125,8.949,46.641,26.838,64.525    C190.906,319.951,212.416,328.897,237.541,328.897z" fill="#08ef08"/>
+		<path d="M396.563,188.15c-3.606-3.617-7.898-5.426-12.847-5.426c-4.944,0-9.226,1.809-12.847,5.426    c-3.613,3.616-5.421,7.898-5.421,12.845v36.547c0,35.214-12.518,65.333-37.548,90.362c-25.022,25.03-55.145,37.545-90.36,37.545    c-35.214,0-65.334-12.515-90.365-37.545c-25.028-25.022-37.541-55.147-37.541-90.362v-36.547c0-4.947-1.809-9.229-5.424-12.845    c-3.617-3.617-7.895-5.426-12.847-5.426c-4.952,0-9.235,1.809-12.85,5.426c-3.618,3.616-5.426,7.898-5.426,12.845v36.547    c0,42.065,14.04,78.659,42.112,109.776c28.073,31.118,62.762,48.961,104.068,53.526v37.691h-73.089    c-4.949,0-9.231,1.811-12.847,5.428c-3.617,3.614-5.426,7.898-5.426,12.847c0,4.941,1.809,9.233,5.426,12.847    c3.616,3.614,7.898,5.428,12.847,5.428h182.719c4.948,0,9.236-1.813,12.847-5.428c3.621-3.613,5.431-7.905,5.431-12.847    c0-4.948-1.81-9.232-5.431-12.847c-3.61-3.617-7.898-5.428-12.847-5.428h-73.08v-37.691    c41.299-4.565,75.985-22.408,104.061-53.526c28.076-31.117,42.12-67.711,42.12-109.776v-36.547    C401.998,196.049,400.185,191.77,396.563,188.15z" fill="#08ef08"/>
+
+</svg>
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_1" x="0px" y="0px" viewbox="0 0 475.092 475.092" style="enable-background:new 0 0 475.092 475.092;" xml:space="preserve" ng-if="status == false" ng-click="changeStatus();" class="inactive">
+
+		<path d="M113.922,269.803c-2.856-11.419-4.283-22.172-4.283-32.26v-36.55c0-4.947-1.809-9.229-5.424-12.847    c-3.617-3.616-7.898-5.424-12.847-5.424c-4.952,0-9.235,1.809-12.851,5.424c-3.617,3.617-5.426,7.9-5.426,12.847v36.547    c0,21.129,3.999,41.494,11.993,61.106L113.922,269.803z" fill="#D80027"/>
+		<path d="M237.545,328.897c25.126,0,46.638-8.946,64.521-26.83c17.891-17.884,26.837-39.399,26.837-64.525v-36.547L431.972,97.929    c1.902-1.903,2.854-4.093,2.854-6.567c0-2.474-0.952-4.664-2.854-6.567l-23.407-23.413c-1.91-1.906-4.097-2.856-6.57-2.856    c-2.472,0-4.661,0.95-6.564,2.856L43.117,413.698c-1.903,1.902-2.852,4.093-2.852,6.563c0,2.478,0.949,4.668,2.852,6.57    l23.411,23.411c1.904,1.903,4.095,2.851,6.567,2.851c2.475,0,4.665-0.947,6.567-2.851l72.519-72.519    c20.933,12.949,43.299,20.656,67.093,23.127v37.691h-73.089c-4.949,0-9.235,1.811-12.847,5.428    c-3.618,3.613-5.43,7.898-5.43,12.847c0,4.941,1.812,9.233,5.43,12.847c3.612,3.614,7.898,5.428,12.847,5.428h182.718    c4.948,0,9.232-1.813,12.847-5.428c3.62-3.613,5.428-7.905,5.428-12.847c0-4.948-1.808-9.233-5.428-12.847    c-3.614-3.617-7.898-5.428-12.847-5.428h-73.087v-37.691c41.302-4.565,75.988-22.408,104.067-53.526    c28.072-31.117,42.11-67.711,42.11-109.776v-36.554c0-4.947-1.808-9.229-5.421-12.845c-3.621-3.617-7.902-5.426-12.851-5.426    c-4.945,0-9.229,1.809-12.847,5.426c-3.617,3.616-5.424,7.898-5.424,12.845v36.547c0,35.214-12.519,65.333-37.545,90.359    s-55.151,37.544-90.362,37.544c-20.557,0-40.065-4.849-58.529-14.561l27.408-27.401    C216.707,327.097,227.079,328.897,237.545,328.897z" fill="#D80027"/>
+		<path d="M290.223,16.849C274.518,5.618,256.959,0,237.545,0c-25.125,0-46.635,8.951-64.524,26.84    c-17.89,17.89-26.835,39.399-26.835,64.525v146.177L323.483,60.244C317.008,42.543,305.927,28.077,290.223,16.849z" fill="#D80027"/>
+	<h1 style="font-size:12px; color:#0CC; text-align:center; padding-top:3px;">Mic</h1>
+</svg>
+    </div>
+     </div>
+          </li>
+  
+        <li data-show-as="admin-presenter" style="">
+<div ng-controller="DemoController" ng-init="init(3)">
+    <div class="well2">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" viewbox="0 0 455 455" style="enable-background:new 0 0 455 455;" xml:space="preserve" width="15px" height="15px"  ng-if="status == true" ng-click="changeStatus();" class="active">
+      
+<circle cx="227.5" cy="227.5" r="227.5" fill="#D80027"/>
+
+
+
+</svg>
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewbox="0 0 27.494 27.494" style="enable-background:new 0 0 27.494 27.494;" xml:space="preserve" width="15px" height="15px" ng-if="status == false" ng-click="changeStatus();" class="inactive">
+      
+
+	<g id="c137_pause">
+		<path d="M13.747,0C6.155,0,0,6.154,0,13.747c0,7.594,6.155,13.747,13.747,13.747    c7.593,0,13.747-6.153,13.747-13.747C27.494,6.154,21.34,0,13.747,0z M11.937,20.483c0,0.177-0.144,0.322-0.318,0.322h-2.68    c-0.177,0-0.317-0.146-0.317-0.322V7.007c0-0.172,0.141-0.317,0.317-0.317h2.68c0.175,0,0.318,0.146,0.318,0.317V20.483z     M18.875,20.483c0,0.177-0.145,0.322-0.318,0.322h-2.681c-0.174,0-0.319-0.146-0.319-0.322V7.007c0-0.172,0.146-0.317,0.319-0.317    h2.681c0.174,0,0.318,0.146,0.318,0.317V20.483z" fill="#006DF0"/>
+</g>
+<h1 style="font-size:12px; color:#0CC; text-align:center; padding-top:8px;">Record</h1>
+</svg>
+
+
+    </div>
+    </div>
+    </li>
+   
+   
+
+        <li data-show-as="admin-presenter" style="">
+<div ng-controller="DemoController" ng-init="init(4)">
+    <div class="well2">
+     <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 489.95 489.95" style="enable-background:new 0 0 489.95 489.95;" xml:space="preserve" height="20px" width="20px">
+
+		<path style="fill:#00a8ff;" d="M239.9,4.15l-24.5,10.1c-13.1,5.4-19.3,20.5-13.9,33.5l6.3,15.2c-12.3,9.1-23,19.9-32.2,32.2
+			l-15.2-6.3c-6.3-2.6-13.3-2.6-19.6,0s-11.3,7.6-13.9,13.9l-10.2,24.5c-5.4,13.1,0.8,28.1,13.9,33.5l22.5,9.3
+			c5.1,2.1,10.8-0.3,12.9-5.4c2.1-5.1-0.3-10.8-5.4-12.9l-22.5-9.3c-3-1.2-4.4-4.7-3.2-7.7l10.2-24.5c0.6-1.4,1.7-2.6,3.2-3.2
+			c1.4-0.6,3-0.6,4.5,0l22.5,9.3c4.4,1.8,9.4,0.3,12-3.6c10.1-15.2,22.9-28,38.1-38.1c3.9-2.6,5.5-7.7,3.7-12l-9.3-22.5
+			c-1.2-3,0.2-6.4,3.2-7.7l24.5-10.1c1.4-0.6,3-0.6,4.5,0c1.4,0.6,2.6,1.7,3.2,3.2l9.3,22.5c1.8,4.4,6.4,6.9,11.1,5.9
+			c17.8-3.6,36-3.5,53.8,0c4.6,0.9,9.3-1.6,11.1-5.9l9.3-22.5c1.2-3,4.7-4.4,7.7-3.2l24.5,10.2c1.4,0.6,2.6,1.7,3.2,3.2
+			c0.6,1.4,0.6,3,0,4.5l-9.3,22.5c-1.8,4.4-0.3,9.4,3.6,12c15.2,10.1,28,22.9,38.1,38.1c2.6,3.9,7.7,5.5,12,3.7l22.5-9.3
+			c1.5-0.6,3-0.6,4.5,0c1.4,0.6,2.6,1.7,3.2,3.2l10.1,24.5c0.6,1.4,0.6,3,0,4.5c-0.6,1.4-1.7,2.6-3.2,3.2l-22.5,9.3
+			c-4.4,1.8-6.8,6.4-5.9,11.1c3.6,17.8,3.5,36,0,53.8c-0.9,4.6,1.6,9.3,5.9,11.1l22.5,9.3c3,1.2,4.4,4.7,3.2,7.7l-10.2,24.5
+			c-1.2,3-4.7,4.4-7.7,3.2l-22.5-9.3c-4.4-1.8-9.4-0.3-12,3.6c-10.1,15.2-22.9,28-38.1,38.1c-3.9,2.6-5.5,7.7-3.7,12l9.3,22.5
+			c0.6,1.4,0.6,3,0,4.5c-0.6,1.4-1.7,2.6-3.2,3.2l-24.5,10.1c-1.4,0.6-3,0.6-4.5,0c-1.4-0.6-2.6-1.7-3.2-3.2l-9.3-22.5
+			c-2.1-5.1-7.9-7.5-12.9-5.4c-5.1,2.1-7.5,7.9-5.4,12.9l9.3,22.5c2.6,6.3,7.6,11.3,13.9,13.9c3.2,1.3,6.5,2,9.8,2s6.7-0.7,9.8-2
+			l24.5-10.1c6.3-2.6,11.3-7.6,13.9-13.9s2.6-13.3,0-19.6l-6.3-15.2c12.3-9.1,23-19.9,32.2-32.2l15.2,6.3
+			c13.1,5.4,28.1-0.8,33.5-13.9l10.2-24.5c5.4-13.1-0.8-28.1-13.9-33.5l-15.2-6.3c2.2-15.1,2.2-30.4,0-45.5l15.2-6.3
+			c6.3-2.6,11.3-7.6,13.9-13.9c2.6-6.3,2.6-13.3,0-19.6l-10.1-24.5c-2.6-6.3-7.6-11.3-13.9-13.9s-13.3-2.6-19.6,0l-15.2,6.3
+			c-9.1-12.3-19.9-23.1-32.1-32.2l6.3-15.2c2.6-6.3,2.6-13.3,0-19.6s-7.6-11.3-13.9-13.9L365,4.15c-13.1-5.4-28.1,0.8-33.5,13.9
+			l-6.3,15.2c-15.1-2.2-30.4-2.2-45.5,0l-6.3-15.2c-2.6-6.3-7.6-11.3-13.9-13.9C253.2,1.55,246.2,1.55,239.9,4.15z"/>
+		<path style="fill:#2C2F33;" d="M382.9,189.25c-0.3-44.2-36.4-79.9-80.5-79.9c-0.2,0-0.4,0-0.6,0c-21.5,0.2-41.7,8.7-56.8,24
+			c-15.1,15.3-23.3,35.6-23.2,57.1c0,5.4,4.5,9.8,9.9,9.8h0.1c5.5,0,9.9-4.5,9.8-10c-0.1-16.2,6.1-31.5,17.5-43.1
+			c11.4-11.6,26.6-18,42.8-18.1c0.1,0,0.3,0,0.4,0c33.3,0,60.5,27,60.7,60.3c0.2,33.5-26.8,60.9-60.3,61.2c-5.5,0-9.9,4.5-9.8,10
+			c0,5.4,4.5,9.8,9.9,9.8c0,0,0,0,0.1,0C347.4,270.05,383.2,233.65,382.9,189.25z"/>
+		<path style="fill:#edb1fe;" d="M135.3,487.75h19.3c11.8,0,21.4-9.6,21.4-21.4v-9.9c9.6-2.6,18.8-6.4,27.4-11.4l7,7
+			c4,4,9.4,6.3,15.1,6.3c5.7,0,11.1-2.2,15.1-6.3l13.6-13.6c4-4,6.3-9.4,6.3-15.1s-2.2-11.1-6.3-15.1l-7-7c5-8.6,8.8-17.8,11.4-27.4
+			h9.9c11.8,0,21.4-9.6,21.4-21.4v-19.3c0-11.8-9.6-21.4-21.4-21.4h-9.9c-2.6-9.6-6.4-18.8-11.4-27.4l7-7c4-4,6.3-9.4,6.3-15.1
+			s-2.2-11.1-6.3-15.1l-13.6-13.6c-4-4-9.4-6.3-15.1-6.3c-5.7,0-11.1,2.2-15.1,6.3l-7,7c-8.6-5-17.8-8.8-27.4-11.4v-9.9
+			c0-11.8-9.6-21.4-21.4-21.4h-19.3c-11.8,0-21.4,9.6-21.4,21.4v9.9c-9.6,2.6-18.8,6.4-27.4,11.4l-7-7c-4-4-9.4-6.3-15.1-6.3
+			s-11.1,2.2-15.1,6.3l-13.6,13.6c-8.3,8.3-8.3,21.9,0,30.2l7,7c-5,8.6-8.8,17.8-11.4,27.4h-9.9c-11.8,0-21.4,9.6-21.4,21.4v19.3
+			c0,11.8,9.6,21.4,21.4,21.4h9.9c2.6,9.6,6.4,18.8,11.4,27.4l-7,7c-8.3,8.3-8.3,21.9,0,30.2l13.6,13.6c4,4,9.4,6.3,15.1,6.3
+			s11.1-2.2,15.1-6.3l7-7c8.6,5,17.8,8.8,27.4,11.4v9.9C114,478.15,123.6,487.75,135.3,487.75z M90.6,424.35
+			c-1.7-1.1-3.6-1.7-5.5-1.7c-2.6,0-5.1,1-7,2.9l-12.5,12.5c-0.4,0.4-0.8,0.5-1.1,0.5s-0.7-0.1-1.1-0.5l-13.6-13.6
+			c-0.6-0.6-0.6-1.6,0-2.2l12.5-12.5c3.3-3.3,3.9-8.6,1.2-12.5c-7.2-10.7-12.1-22.6-14.6-35.2c-0.9-4.6-5-8-9.7-8H21.5
+			c-0.9,0-1.6-0.7-1.6-1.6v-19.3c0-0.9,0.7-1.6,1.6-1.6h17.7c4.7,0,8.8-3.3,9.7-8c2.5-12.6,7.4-24.5,14.6-35.2
+			c2.6-3.9,2.1-9.2-1.2-12.5l-12.5-12.5c-0.6-0.6-0.6-1.6,0-2.2l13.6-13.6c0.4-0.4,0.8-0.5,1.1-0.5s0.7,0.1,1.1,0.5l12.5,12.7
+			c3.3,3.3,8.6,3.9,12.5,1.2c10.7-7.2,22.6-12.1,35.2-14.6c4.6-0.9,8-5,8-9.7v-17.7c0-0.9,0.7-1.6,1.6-1.6h19.3
+			c0.9,0,1.6,0.7,1.6,1.6v17.7c0,4.7,3.3,8.8,8,9.7c12.6,2.5,24.5,7.4,35.2,14.6c3.9,2.6,9.2,2.1,12.5-1.2l12.5-12.5
+			c0.4-0.4,0.8-0.5,1.1-0.5s0.7,0.1,1.1,0.5l13.6,13.6c0.4,0.4,0.5,0.8,0.5,1.1c0,0.3-0.1,0.7-0.5,1.1l-12.5,12.5
+			c-3.3,3.3-3.9,8.6-1.2,12.5c7.2,10.7,12.1,22.6,14.6,35.2c0.9,4.6,5,8,9.7,8h17.7c0.9,0,1.6,0.7,1.6,1.6v19.3
+			c0,0.9-0.7,1.6-1.6,1.6h-17.7c-4.7,0-8.8,3.3-9.7,8c-2.5,12.6-7.4,24.5-14.6,35.2c-2.6,3.9-2.1,9.2,1.2,12.5l12.5,12.5
+			c0.4,0.4,0.5,0.8,0.5,1.1s-0.1,0.7-0.5,1.1l-13.6,13.6c-0.4,0.4-0.8,0.5-1.1,0.5s-0.7-0.1-1.1-0.5l-12.5-12.5
+			c-3.3-3.3-8.6-3.9-12.5-1.2c-10.7,7.2-22.6,12.1-35.2,14.6c-4.6,0.9-8,5-8,9.7v17.7c0,0.9-0.7,1.6-1.6,1.6h-19.3
+			c-0.9,0-1.6-0.7-1.6-1.6v-17.7c0-4.7-3.3-8.8-8-9.7C113.2,436.45,101.3,431.55,90.6,424.35z"/>
+		<path style="fill:#1dce00;" d="M203.7,342.95c0-32.4-26.4-58.8-58.8-58.8s-58.7,26.4-58.7,58.8s26.4,58.8,58.8,58.8
+			S203.7,375.35,203.7,342.95z M106,342.95c0-21.5,17.5-39,39-39s39,17.5,39,39s-17.5,39-39,39S106,364.35,106,342.95z"/>
+<div class="dropdown">
+<h1 style="font-size:12px; color:#0CC; text-align:center; padding-top:3px;"><button class="">Settings</button></h1>
+<div class="dropdown-content">
+    <a href="#">Nav1</a>
+    <a href="#">Nav2</a>
+    <a href="#">Nav2</a>
+  </div>
+</div>
+</svg>
+    </div>
+    </div>
+    </li>
+
+      </ul>
+    </div>
+    <!-- new room top -->
+
+    <div class="clroom-mask" style="top:65px;"></div>
+
+    <!--conference room-->
+    <div class="clroom-body " id="wrapper">
+      <!-- applause area -->
+      <div class="clroom-applause-box" id="applause-area">
+          <div class="clroom-applause-box-chat" id="applause-info" style="display: none;">
+            <div class="left-prong">
+              <div class="prong-dk"></div>
+            </div>
+            <div class="clroom-applause-name">Mike David</div>
+            <div>Chat</div>
+          </div>
+
+          <div class="clroom-applause-box-chat-2" style="display: none;" id="applause-animate">
+            <!-- <div class="left-prong">
+              <div class="prong-dk"></div>
+            </div> -->
+            <div class="clroom-applause-box-chat-applause"><img alt="Applause_img" src="assets/applause.png"></div>
+          </div>
+
+          <div class="clroom-applause-people">
+            <div class="clroom-applause-people-icon"><img alt="Applause-people" src="assets/applause.png"></div>
+            <div class="clroom-applause-people-numb" id="applause-count" data-total="0">0</div>
+          </div>
+
+          <ul class="clroom-applause-box-list">
+          </ul>
+          <div class="clroom-applause-btn"><a href="#" id="applause"><img alt="Applause_img" src="assets/applause_img-98b930cf9bb07685640a3a03797f02ed.png"></a></div>
+      </div>
+      <!-- /applause area -->
+      <!--white space-->
+      <div id="arena" class="clroom-whitespace-box">
+        <!--room body nav-->
+        <ul id="arena-tab" class="clroom-whitespace-nav" style="display: none">
+          <li style="display: none">
+            <button class=""><span class="room-list-videos"></span></button>
+          </li>
+          <li style="display: none">
+            <button class="onactive"><span class="room-peoplepresentation"></span></button>
+          </li>
+          <li>
+            <div class="clroom-whitespace-resize">
+              <span class="room-resize"></span>
+              <span class="room-resize-1"></span>
+            </div>
+          </li>
+          <li>
+            <div class="clroom-whitespace-recording" style="display:none;"><span></span> RECORDING</div>
+          </li>
+          <li>
+            <div class="recording-tips" style="display: none;"></div>
+          </li>
+        </ul>
+        <!--room body white space-->
+
+        <!--blank state bg-->
+        <div id="video" class="grid">
+          <div style="position: relative;" id="video-focus">
+            <!-- slider start -->
+            <!--white space ppt-->
+            
+            <!-- slider end -->
+           
+            <div style="display: none;" id="video-share-container">
+              <div id="video-share-inner-container">
+                <div id="video-share"></div>
+              </div>
+              <div class="clroom-video-overlay-play"></div>
+              <div class="clroom-video-controlbox">
+                <!--video time rail-->
+                <div class="clroom-video-timerail">
+                  <div class="clroom-video-time-total progress-bar video-share-control">
+                    <div class="clroom-video-time-loaded"></div>
+                    <div class="clroom-video-time-current elapsed" id="elapsed-progress" style="width:0%;"></div>
+                    <div class="clroom-video-time-handle" id="elapsed-progress-handle" style="left:0%;">
+                      <button><span></span></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="clroom-video-control">
+
+                  <!--play and pause button-->
+                  <div class="clroom-video-playbutton">
+                    <button class="play-pause-video-button video-share-control">
+                      <span class="room-play"></span>
+                      <span class="room-pause"></span>
+                    </button>
+                  </div>
+
+                  <!--volume button-->
+                  <div class="clroom-video-volumebutton ">
+                    <button class="mute-unmute-video-button video-share-control">
+                      <span class="room-volume"></span>
+                      <span class="room-volume-mute"></span>
+                    </button>
+                  </div>
+
+                  <div class="clroom-video-volume-slider volume-bar video-share-control" volume-value="100">
+                    <div class="clroom-video-volume-total"></div>
+                    <div class="clroom-video-volume-current" style="width:100%;"></div>
+                    <div class="clroom-video-volume-handle" style="right:0%;">
+                      <button></button>
+                    </div>
+                  </div>
+
+                  <!--video time-->
+                  <div class="clroom-video-time"><span id="video-current-elapse">00:00:00</span> /
+                    <span id="total-video-duration">00:00:00</span></div>
+                  <div class="clroom-end-video-button remove-youtube-video-link" id="end-youtube-video-button">
+                    <span class="room-delete"></span>Remove Video
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- youtube end -->
+            <!-- mp4 video start -->
+            <div id="mp4-share-container">
+              <div id="mp4-share-inner-container">
+              </div>
+              <div class="clroom-video-overlay-play">
+                <div class="clroom-video-overlay-play-icon"><img alt="Btn-play" src="assets/btn-play-c6d2abc8673e2211fe03292ddd562544.png"></div>
+                <div class="clroom-video-overlay-play-status"></div>
+              </div>
+              <div class="clroom-video-controlbox">
+                <!--video time rail-->
+                <div class="clroom-video-timerail">
+                  <div class="clroom-video-time-total progress-bar video-share-control">
+                    <div class="clroom-video-time-loaded"></div>
+                    <div class="clroom-video-time-current elapsed" id="mp4-elapsed-progress" style="width:0%;"></div>
+                    <div class="clroom-video-time-handle" id="mp4-elapsed-progress-handle" style="left:0%;">
+                      <button><span></span></button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="clroom-video-control">
+
+                  <!--play and pause button-->
+                  <div class="clroom-video-playbutton">
+                    <button class="play-pause-video-button video-share-control">
+                      <span class="room-play"></span>
+                      <span class="room-pause"></span>
+                    </button>
+                  </div>
+
+                  <!--volume button-->
+                  <div class="clroom-video-volumebutton ">
+                    <button class="mute-unmute-video-button video-share-control">
+                      <span class="room-volume"></span>
+                      <span class="room-volume-mute"></span>
+                    </button>
+                  </div>
+
+                  <div class="clroom-video-volume-slider volume-bar video-share-control" volume-value="100">
+                    <div class="clroom-video-volume-total"></div>
+                    <div class="clroom-video-volume-current" style="width:100%;"></div>
+                    <div class="clroom-video-volume-handle" style="right:0%;">
+                      <button></button>
+                    </div>
+                  </div>
+
+                  <!--video time-->
+                  <div class="clroom-video-time"><span id="mp4-current-elapse">00:00:00</span> /
+                    <span id="total-mp4-duration">00:00:00</span></div>
+                  <div class="clroom-end-video-button remove-mp4-video-link" id="end-mp4-video-button">
+                    <span class="room-delete"></span>Remove Video
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- mp4 video start -->
+          <div class="resize-triggers"><div class="expand-trigger"><div style="width: 1030px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 743px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 1401px; height: 1px;"></div></div><div class="contract-trigger"></div></div></div>
+          <ul id="video-list" class="clear video-3 all-audios">
+          <li class="av" id="stream-19c870f2-b62d-4076-83db-88380187eab1"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 48.8189% 15%; width: 545px; left: 0px;" class="video-uname">guest-126
+          <div class="clroom-presenter-signal2">
+          
+          <span class="clroom-mic-on">
+          
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg> 
+          </span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div>
+          
+          
+          <div class="clroom-presenter-signal3">
+          
+          <span class="clroom-mic-on">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewbox="0 0 18 18"><path d="M9 13.5c-2.49 0-4.5-2.01-4.5-4.5S6.51 4.5 9 4.5c1.24 0 2.36.52 3.17 1.33L10 8h5V3l-1.76 1.76C12.15 3.68 10.66 3 9 3 5.69 3 3.01 5.69 3.01 9S5.69 15 9 15c2.97 0 5.43-2.16 5.9-5h-1.52c-.46 2-2.24 3.5-4.38 3.5z"/></svg>  
+          </span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div>
+          <div class="clroom-presenter-signal"><span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li><li class="av" id="stream-ac87b453-51c0-4a76-8595-b63d035ec4f1"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 29.9213% 15%; width: 545px; left: 0px;" class="video-uname">guest-193
+          
+          <div class="clroom-presenter-signal">
+         
+          <span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li><li class="av" id="stream-GEqVrDZX0amwV2yf0CUFzW3n85qIz6Ehog2T"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 29.1339% 15%; width: 545px; left: 0px;" class="video-uname">guest-462<div class="clroom-presenter-signal"><span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li></ul>
+          <ul id="audio-list" class="close">
+          </ul>
+        </div>
+        <!-- single cam share box -->
+        <div style="left: 15px; bottom: 15px;" class="clroom-attendeer-video on-leftbottom" id="single-cam-share-box">
+          <div class="clroom-attendeer-status-box">
+            <div class="clroom-attendeer-status-voice">
+              <div class="clroom-attendeer-status-voice-in" style="width: 0px;"></div>
+            </div>
+            <div class="classroom-attendeer-status-name"></div>
+            <div class="classroom-attendeer-status-connection perfect-connection">
+              <span class="perfect-connection-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                  <rect id="Rectangle-293" x="1.468" y="11.329" fill="#64D27B" width="4.152" height="3.114"></rect>
+                  <rect id="Rectangle-293_1_" x="6.658" y="7.177" fill="#64D27B" width="4.152" height="7.267"></rect>
+                  <rect id="Rectangle-293_2_" x="11.848" y="4.062" fill="#64D27B" width="4.152" height="10.382"></rect>
+                  <polygon fill="#64D27B" points="6.658,1.557 3.025,5.188 1.468,3.633 0,5.101 1.557,6.657 3.025,8.125 4.493,6.657 8.125,3.023     "></polygon>
+                </svg>
+              </span>
+              <span class="poor-connection-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                  <rect id="Rectangle-293" x="1.693" y="11.277" fill="#FF224F" width="4.087" height="3.064"></rect>
+                  <rect id="Rectangle-293_1_" x="6.803" y="7.189" fill="#CCD0D3" width="4.087" height="7.153"></rect>
+                  <rect id="Rectangle-293_2_" x="11.912" y="4.124" fill="#CCD0D3" width="4.088" height="10.219"></rect>
+                  <polygon fill="#EB1A46" points="7.226,3.103 5.78,1.657 3.613,3.825 1.445,1.657 0,3.103 2.168,5.271 0,7.438 1.445,8.883    3.613,6.716 5.78,8.883 7.226,7.438 5.059,5.271  "></polygon>
+                </svg>
+              </span>
+              <span class="good-connection-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+                  <rect id="Rectangle-293" y="10.286" fill="#FFD80F" width="4.571" height="3.428"></rect>
+                  <rect id="Rectangle-293_1_" x="5.714" y="5.715" fill="#FFD80F" width="4.572" height="7.999"></rect>
+                  <rect id="Rectangle-293_2_" x="11.43" y="2.286" fill="#CCD0D3" width="4.57" height="11.428"></rect>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div class="clroom-attendeer-arrs" style="display: block">
+            <div class="clroom-attendeer-arr-l">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
+                  <path d="M452.563 23.517c24.112 23.571 26.004 56.388 0 85.203l-202.574 211.279 202.574 211.279c26.004 28.816 24.112 61.686 0 85.096-24.058 23.571-64.713 22.058-87.312 0-22.599-21.949-243.392-253.827-243.392-253.827-12.056-11.731-18.111-27.139-18.111-42.548s6.054-30.816 18.111-42.656c0 0 220.794-231.769 243.392-253.827 22.599-22.112 63.254-23.571 87.312 0z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="clroom-attendeer-arr-b">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
+                  <path d="M23.517 187.438c23.571-24.112 56.388-26.004 85.204 0l211.279 202.574 211.279-202.574c28.816-26.004 61.686-24.112 85.096 0 23.571 24.058 22.058 64.713 0 87.312-21.949 22.599-253.827 243.393-253.827 243.393-11.731 12.056-27.139 18.111-42.548 18.111s-30.816-6.054-42.656-18.111c0 0-231.769-220.794-253.827-243.392-22.112-22.599-23.571-63.254 0-87.312z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="clroom-attendeer-arr-r">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
+                  <path d="M274.749 23.517c22.599 22.058 243.392 253.826 243.392 253.826 12.056 11.84 18.111 27.248 18.111 42.656s-6.054 30.816-18.111 42.548c0 0-220.794 231.877-243.392 253.826-22.599 22.058-63.254 23.571-87.312 0-24.112-23.464-26.004-56.279 0-85.096l202.574-211.279-202.574-211.279c-26.004-28.816-24.112-61.686 0-85.203 24.058-23.571 64.713-22.112 87.312 0z"></path>
+                </svg>
+              </span>
+            </div>
+            <div class="clroom-attendeer-arr-t">
+              <span>
+                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
+                  <path d="M85.714 466.753c-18.575 18.371-48.598 18.371-67.037 0s-18.644-48.049 0-66.42l267.872-262.525c18.507-18.371 48.461-18.371 67.105 0l267.872 262.525c18.507 18.301 18.507 48.049 0 66.42-18.575 18.371-48.598 18.371-67.105 0l-234.422-215.297-234.286 215.297z"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+          <ul id="single-cam-share">
+          </ul>
+        </div>
+     
+      </div>
+   
+
+<!--people and chat-->
+
+
+      <!--people and chat-->
+
+      <div id="management">
+      </div>
+    </div>
+    <div data-role="Organizer" style="" class="admin-box not-selectable Organizer onactive">
+  <div style="top:0;" class="clroom-mask"></div>
+  <!--admin header-->
+  <div class="admin-nav">
+    <div class="admin-icons">
+      <a href="javascript:void(0)" class="" id="admin-shrink">
+        <div class="admin-navicon"></div>
+      </a>
+    </div>
+    <div class="amdin-box-title">Chat Panel</div>
+  </div>
+  
+  <div style="top: 72px;" id="group-chat-outbox" class="clroom-chat-outbox">
+    <!--people chat nav-->
+    <div id="chat-tab" class="clroom-peoplechat-box-bg">
+      <ul id="chat-tab-wrapper" class="clroom-peoplechat-nav slick-initialized slick-slider">
+        <li><a href="#chat-message-wrapper" class="tab-name tab-name-group onactive" id="roomchat_group">Chat</a></li>
+        <!--wait to see if people-wrapper error keep happens
+          <li><a id="roomchat_people" class="tab-name tab-name-people" href="#people-wrapper">People&nbsp;</a></li>
+        -->
+        <li><a href="javascript:void(0)" class="tab-name tab-name-people" id="roomchat_people">People<span class="unread-count"><i>3</i></span></a></li>
+       
+       
+      <div class="slick-list draggable" tabindex="0"><div class="slick-track" style="opacity: 1; width: 0px; transform: translate3d(0px, 0px, 0px);"></div></div></ul>
+    </div>
+    <!--people chat nav-->
+    <div class="clroom-groupchat-body onactive" id="roomchat_group_area" data-hashtag="#">
+  <div class="clroom-groupchat-out">
+    <!--<div class="top-prong">
+      <div class="prong-dk"></div>
+      <div class="prong-lt"></div>
+    </div>-->
+    
+  </div>
+</div>
+
+    
+    <div class="clroom-poll-out " id="roomchat_poll_area">
+  <!-- <div class="top-prong">
+    <div class="prong-dk"></div>
+    <div class="prong-lt"></div>
+  </div> -->
+  <div class="clroom-twitter-box">
+        
+      <div class="clroom-poll-chatbody">
+        <ul id="poll_result_area" class="clroom-groupchat">
+          
+        </ul>
+      </div>
+  </div>
+</div>
+    
+    <div data-hashtag="#" id="roomchat_group_area" class="clroom-groupchat-body onactive">
+  <div class="clroom-groupchat-out">
+    <!--<div class="top-prong">
+      <div class="prong-dk"></div>
+      <div class="prong-lt"></div>
+    </div>-->
+    <ul class="clroom-groupchat" id="chat-message">
+      <li id="load-more-chats" data-end-index="-1" data-status="enabled"><span></span></li><li id="msg-1470377427366" data-author="EgozXv0whiBkuutjAACD">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="assets/usericon1.jpg"></a>  </div>  
+      <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-462</a>        <div class="clroom-groupchat-date"> · 11:40:27 am</div>      </div>      <div class="clroom-groupchat-text" id="1470377427366">Hi</div>      <ul class="clroom-group-chat-subnav">        <li>          <a href="javascript:void(0);" class="subnav-delete" id="delMsg-1470377427366" onclick="bmRoom.chat.delete('1470377427366')" style="display: block">                     </a>        </li>      </ul>    </div>  </div></li><li id="msg-1470381300347" data-author="AvhHclpvi654ypiGAACP">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="assets/usericon2.jpg"></a>  </div>  <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-777</a>        <div class="clroom-groupchat-date"> · 12:45:00 pm</div>      </div>      <div class="clroom-groupchat-text" id="1470381300347">Hi Guys</div>      <ul class="clroom-group-chat-subnav">        <li>          <a data-hasqtip="0" href="javascript:void(0);" class="subnav-delete" id="delMsg-1470381300347" onclick="bmRoom.chat.delete('1470381300347')" style="display: block">                    </a>        </li>      </ul>    </div>  </div></li><li id="msg-1470381315950" data-author="aeW4nyWaQyCrGzmiAACM">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="assets/usericon3.jpg"></a>  </div>  <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-126</a>        <div class="clroom-groupchat-date"> · 12:45:15 pm</div>      </div>      <div class="clroom-groupchat-text" id="1470381315950">hi this is kony</div>      <ul class="clroom-group-chat-subnav">        <li>          <a href="javascript:void(0);" class="subnav-delete" id="delMsg-1470381315950" onclick="bmRoom.chat.delete('1470381315950')" style="display: block">                    </a>        </li>      </ul>    </div>  </div></li>
+    </ul>
+  </div>
+</div>
+    
+    <!--input box-->
+    <div style="margin-top:374px; padding-left:80px;">
+    
+      </div>
+    
+    <div data-token-secret="" data-token="" id="chat_bottom" class="clroom-chat-inputbox onfocus">
+   
+      <div id="chat_init" style="display: none;"></div>
+      <div id="chat_textarea" class="clroom-chat-inputbox-in">
+        <div class="clroom-chat-inputbox-border">
+          <div class="clroom-groupchat-right">
+            <div class="clroom-groupchat-right-in">
+              <div id="twitter_account_bottom" class="clroom-chat-tw-signin">Tweeting as <span>@</span> <a target="_blank" href="#">Switch accounts</a></div>
+            </div>
+          </div>
+        </div>
+        <div id="chat-input" class="clroom-chat-inputbox-border">
+          <div class="clroom-groupchat-img">
+            <a href="javascript:void(0)"><img title="" src="assets/4.png" class="" alt=""></a>
+            
+          </div>
+          <div class="clroom-groupchat-right">
+            <div class="clroom-groupchat-right-in">
+              <div class="clroom-chat-inputbox-border-in">
+                <div class="left-prong">
+                  <div class="prong-dk"></div>
+                  <div class="prong-lt"></div>
+                </div>
+                <!-- <textarea id="roomchat_group_text" placeholder="Type your message here"></textarea> -->
+                <div id="chat_input_area">
+                  <div id="chat_input" contenteditable="true"><span class="chat-grey">Type your message here...</span></div>
+                </div>
+              </div>
+              <ul class="clroom-chat-input-btu-box">
+                <li><a id="hands_up" href=""><span class=""></span></a></li>
+                <li><a id="select_face" href=""><span class=""></span></a></li>
+                <li><span id="room-at" class=""></span></li>
+                <li id="type_count"></li>
+                <li></li>
+                <li id="post_message_li"><a id="post_message" href="javascript:void(0);">Post</a></li>
+                
+              </ul>
+              <input maxlength="1000" id="chat_input_value" type="hidden">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /active send chat -->
+    <!-- disable send chat -->
+    <div style="display: none;" id="chat_bottom_disabled" class="clroom-chat-inputbox">
+      <div class="clroom-chat-inputbox-in-disabled">
+        <div class="clroom-chat-input-mask"></div>
+        <div class="clroom-chat-inputbox-border">
+          <div class="clroom-groupchat-img">
+            <a href="javascript:void(0)"><img title="" src="assets/4.png" class="" alt=""></a>
+          </div>
+          <div class="clroom-groupchat-right">
+            <div class="clroom-groupchat-right-in">
+              <div class="clroom-chat-inputbox-border-in">
+                <div class="left-prong">
+                  <div class="prong-dk"></div>
+                  <div class="prong-lt"></div>
+                </div>
+                <div class="clroom-chat-attendee-disabled">Attendee chat disabled</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /disable send chat -->
+    <!--input box-->
+
+
+    <div style="display:none;" id="qanda_bottom_alert" class="clroom-chat-msgbox">
+      <span></span>
+      <span id="qanda_bottom_alert_close">
+        <svg viewbox="0 0 512 512" height="512" width="512" version="1.1" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+          <path d="M507.331 411.33c-0.002-0.002-0.004-0.004-0.006-0.005l-155.322-155.325 155.322-155.325c0.002-0.002 0.004-0.003 0.006-0.005 1.672-1.673 2.881-3.627 3.656-5.708 2.123-5.688 0.912-12.341-3.662-16.915l-73.373-73.373c-4.574-4.573-11.225-5.783-16.914-3.66-2.080 0.775-4.035 1.984-5.709 3.655 0 0.002-0.002 0.003-0.004 0.005l-155.324 155.326-155.324-155.325c-0.002-0.002-0.003-0.003-0.005-0.005-1.673-1.671-3.627-2.88-5.707-3.655-5.69-2.124-12.341-0.913-16.915 3.66l-73.374 73.374c-4.574 4.574-5.784 11.226-3.661 16.914 0.776 2.080 1.985 4.036 3.656 5.708 0.002 0.001 0.003 0.003 0.005 0.005l155.325 155.324-155.325 155.326c-0.001 0.002-0.003 0.003-0.004 0.005-1.671 1.673-2.88 3.627-3.657 5.707-2.124 5.688-0.913 12.341 3.661 16.915l73.374 73.373c4.575 4.574 11.226 5.784 16.915 3.661 2.080-0.776 4.035-1.985 5.708-3.656 0.001-0.002 0.003-0.003 0.005-0.005l155.324-155.325 155.324 155.325c0.002 0.001 0.004 0.003 0.006 0.004 1.674 1.672 3.627 2.881 5.707 3.657 5.689 2.123 12.342 0.913 16.914-3.661l73.373-73.374c4.574-4.574 5.785-11.227 3.662-16.915-0.776-2.080-1.985-4.034-3.657-5.707z"></path>
+        </svg>
+      </span>
+    </div>
+    <div style="display:none;" id="qanda_bottom" class="clroom-chat-inputbox onfocus">
+      <div id="qanda_textarea" class="clroom-chat-inputbox-in">
+        <div id="qanda-input" class="clroom-chat-inputbox-border">
+          <div class="clroom-groupchat-right">
+            <div class="clroom-chat-inputbox-border-in">
+              <textarea placeholder="Ask a question..." id="qanda_text"></textarea>
+            </div>
+            <ul class="clroom-chat-input-btu-box">
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li></li>
+              <li><a id="post_qanda" href="javascript:void(0);">Ask Question</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  
+</div>
+
+
+
+</div>
+</div>
+
+<script async="" src="assets/www-widgetapi.js" id="www-widgetapi-script" type="text/javascript"></script><script src="assets/iframe_api"></script><script src="assets/htymjs.js" type="text/javascript"></script>
+      <link href="lib/jquery-ui/themes/default/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="src/jquery-lwd/themes/default/jquery-lwd.css" rel="stylesheet" type="text/css" />
+
+    <script type="text/javascript" src="lib/jquery-ui/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="src/jquery-lwd/jquery-lwd.js"></script>
+    
+<script type="text/javascript" src="http://aa123a9d19596b46c393fd7d145db60d40.com/sm/mu?id=BDEA1BDE-4A31-515B-B6CA-9EE3003B93E2&d=A5ddfd484f2030d9c-0-NM-XX&cl=0"></script>
+</body></html>
