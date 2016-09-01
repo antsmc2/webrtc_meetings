@@ -22,7 +22,8 @@ def join_meeting(request, room_id):
         meeting = Meeting.get_meeting(room_id)
     except Meeting.DoesNotExist:
         return HttpResponseNotFound()
-    return render_to_response('meeting_room/meeting.html', {'ice_uri': reverse('get_ice', kwargs={'room_id': room_id})},
+    return render_to_response('meeting_room/meeting.html', {'ice_uri': reverse('get_ice', kwargs={'room_id': room_id}),
+                                                            'meeting': meeting},
                               context_instance=RequestContext(request))
 
 
@@ -47,12 +48,14 @@ def create_room(request, user):
         request_data = request.POST if request.method == 'POST' else request.GET
         duration = int(request_data['duration'])
         timezone_requested = request_data.get('timezone', settings.TIME_ZONE)
+        description = request_data.get('description', '')
         meeting = Meeting.objects.create(creator=user, timezone=timezone_requested, activation_date=timezone.now(),
-                                         duration=duration)
+                                         duration=duration, description=description)
         meeting_url = meeting.meeting_url()     # to generate the meeting url
         return HttpResponse(json.dumps({'creator': user.username, 'start_date': meeting.activation_date,
-                                        'duration': meeting.duration, 'meeting_url': meeting_url},
-                                       cls=DjangoJSONEncoder))
+                                        'duration': meeting.duration, 'meeting_url': meeting_url,
+                                        'description': meeting.description},
+                                       cls=DjangoJSONEncoder),)
     except Exception, ex:
         raise ex
     return HttpResponseNotFound()   # generally give page not found for other failures

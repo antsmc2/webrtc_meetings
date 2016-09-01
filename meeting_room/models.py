@@ -17,7 +17,8 @@ class Meeting(Base):
     activation_date = models.DateTimeField(help_text='Choose time when this meeting shall become active')
     duration = models.PositiveIntegerField(help_text='Choose duration in minutes for which the meeting shall be active')
     end_date = models.DateTimeField(null=True, blank=True, editable=False)
-    room_id = models.CharField(max_length=200, editable=False, blank=True, null=True)
+    room_id = models.CharField(max_length=200, editable=False, blank=True, null=True, db_index=True, unique=True)
+    description = models.TextField(null=True, blank=True, help_text='Enter brief description of the meeting (Optional)')
 
 
     def _setup(self):

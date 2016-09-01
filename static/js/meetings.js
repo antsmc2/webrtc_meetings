@@ -7,9 +7,10 @@
 var myHostname = window.location.hostname;
 var myPort = window.location.port;
 console.log("Hostname: " + myHostname);
-var uniqueId = Math.floor((1 + Math.random()) * 0x100000);
+var uniqueId = null;
 var serverUrl = null;
 var localStream = null;
+var iceURI = null;
 var peers = {};
 var dataChannels = {}
 var remoteVideos = {}
@@ -31,6 +32,8 @@ var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#status');
 var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
+var toggleCallButton = document.getElementById('toggleCall');
+toggleCallButton.onclick = toggleCall;
 muteVideoButton.onclick = toggleMuteVideo;
 muteAudioButton.onclick = toggleMuteAudio;
 
@@ -77,6 +80,10 @@ var PEER_BINARY = 3
 var iceServers;
 function getIceServers() {
     return iceServers;
+}
+
+function generateUniqueId() {
+    return Math.floor((1 + Math.random()) * 0x100000);
 }
 
 
@@ -140,8 +147,7 @@ function gotRemoteStream(e, peer_id) {
   remoteVideo.src = window.URL.createObjectURL(e.stream);
   remoteVideo.id = peer_id;
   remoteVideo.autoplay = true;
-  videoContainer.appendChild(remoteVideo);
-  remoteVideos[peer_id] = remoteVideo;
+  attachRemoteVideo(peer_id, remoteVideo);
   trace('received remote stream from: ' + peer_id);
 }
 
@@ -159,6 +165,8 @@ function sendThroughServer(msg) {
 }
 
 function connect(ice_uri) {
+  iceURI = ice_uri;
+  uniqueId = generateUniqueId();
   var scheme = "ws";
 
   // If this is an HTTPS connection, we have to use a secure WebSocket
@@ -174,8 +182,8 @@ function connect(ice_uri) {
           iceServers = JSON.parse(xhttp.responseText);
        }
   };
- trace('using ice uri: ' + ice_uri);
- xhttp.open("GET", ice_uri, true);
+ trace('using ice uri: ' + iceURI);
+ xhttp.open("GET", iceURI, true);
  xhttp.send();
  trace('my unique id: ' + uniqueId);
 }
@@ -241,7 +249,7 @@ function start(onMediaInit) {
   trace('Requesting local stream');
   trace('using media callback ' + onMediaInit);
   var mediaConstraints = getUserMediaConstraints();
-  trace('using media constraints: ' + mediaConstraints);
+  trace('using media constraints: ' + JSON.stringify(mediaConstraints));
   navigator.mediaDevices.getUserMedia(mediaConstraints)
   .then(function(stream) {
       trace('got user media');
@@ -270,6 +278,7 @@ function gotLocalStream(stream) {
   localVideo.muted = "muted";
   localStream = stream;
   window.stream = localStream;
+  enableButtons();
   trace('done setting local stream');
 }
 
@@ -307,11 +316,11 @@ function makeOrGetPeer(id) {
   peerConnection.onsignalingstatechange = function(e) {
     var state = peers[id].signalingState;
     trace(id + ' state changed to ' + state);
-    switch(state){
-        case "closed":
-            handleGuestLeft(id);
-            break;
-    }
+//    switch(state){
+//        case "closed":
+//            handleGuestLeft(id);
+//            break;
+//    }
   }
   peers[id] = peerConnection;
   return peerConnection;
@@ -329,10 +338,26 @@ function handleGuest(peer_id) {
 
 function handleGuestLeft(peer_id) {
     trace(peer_id + ' left! cleaning up...');
+    muteVideo(peer_id);
+    muteAudio(peer_id);
+    peers[peer_id].close();
     delete peers[peer_id];
-    videoContainer.removeChild(remoteVideos[peer_id]);
-    delete remoteVideos[peer_id];
+    removeRemoteVideo(peer_id);
 }
+
+function attachRemoteVideo(peer_id, remoteVideo) {
+    videoContainer.appendChild(remoteVideo);
+    remoteVideos[peer_id] = remoteVideo;
+}
+
+function removeRemoteVideo(peer_id) {
+    if(remoteVideos[peer_id])
+    {
+        videoContainer.removeChild(remoteVideos[peer_id]);
+        delete remoteVideos[peer_id];
+    }
+}
+
 
 function handleVideoAnswerMsg(msg) {
   var peer_id = msg.name;
@@ -536,6 +561,7 @@ function setUpDataChannel(peer_id) {
 
   dataChannel.onclose = function () {
     trace(peer_id + ": The Data Channel is Closed");
+    handleGuestLeft(peer_id);
   };
   trace('done setting up channel: '+ peer_id);
 }
@@ -700,4 +726,54 @@ function toggleMuteAudio() {
         muteAudioButton.textContent = 'Mute Audio';
    }
    muteAudio();
+}
+
+function toggleCall() {
+    if(toggleCallButton.textContent.toLowerCase() == 'disconnect'){
+        stopCall();
+        toggleCallButton.textContent = 'Connect';
+    }else{
+        restartCall();
+        toggleCallButton.textContent = 'Disconnect';
+    }
+
+}
+
+function stopCall() {
+    if(localStream && localStream.getTracks())
+        localStream.getTracks()[0].stop();
+    localStream = null;
+    localVideo.src = null;
+    localVideo.srcObject = null;
+    myVideoContainer.removeChild(localVideo);
+    localVideo = null;
+    for(var peer_id in peers) {
+        handleGuestLeft(peer_id);
+    }
+    connection.close();
+    connection = null;
+    resetButtons();
+    disableButtons();
+}
+
+function restartCall() {
+    connect(iceURI);
+}
+
+function resetButtons() {
+    muteAudioButton.textContent = 'mute';
+    muteVideoButton.textContent = 'mute';
+}
+
+function enableButtons() {
+    muteAudioButton.disabled = false;
+    muteVideoButton.disabled = false;
+    toggleCallButton.disabled = false;
+    fileInput.disabled = false;
+}
+
+function disableButtons() {
+    muteAudioButton.disabled = true;
+    muteVideoButton.disabled = true;
+    fileInput.disabled = true;
 }

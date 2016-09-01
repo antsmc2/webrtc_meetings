@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>{{title}}</title>
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <link type="text/css" href="{% static "css/base.css" %}" />
 </head>
 <body>
     <div id="main">
@@ -54,7 +55,7 @@
             </div>
             <div id="file-share" class="file-share">
                 <form id="fileInfo">
-                    <input type="file" id="fileInput" name="files"/>
+                    <input type="file" id="fileInput" name="files" disabled="disabled"/>
                 </form>
                 <div class="progress">
                     <div class="label">Send progress: </div>
@@ -70,14 +71,17 @@
                       <span id="status"></span>
                   </div>
                   <div id="">
-                      <button id="muteAudio">Mute Audio</button>
-                      <button id="muteVideo">Mute Video</button>
+                      <button id="muteAudio"  disabled="disabled">Mute Audio</button>
+                      <button id="muteVideo"  disabled="disabled">Mute Video</button>
                   </div>
                   <div id="recordings">
                       <div>
                           <button id="recordButton">Start Recording</button>
                           <button id="downloadRecordButton" disabled="disabled">Download</button>
                       </div>
+                  </div>
+                  <div id="restart">
+                      <button id="toggleCall" disabled="disabled">Disconnect</button>
                   </div>
             </div>
         </div>
