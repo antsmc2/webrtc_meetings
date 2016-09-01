@@ -740,15 +740,16 @@ function toggleCall() {
 }
 
 function stopCall() {
-    if(localStream && localStream.getTracks())
+    if(localStream && localStream.getTracks()) {
         localStream.getTracks()[0].stop();
-    localStream = null;
-    localVideo.src = null;
-    localVideo.srcObject = null;
-    myVideoContainer.removeChild(localVideo);
-    localVideo = null;
-    for(var peer_id in peers) {
-        handleGuestLeft(peer_id);
+        localStream = null;
+        localVideo.src = null;
+        localVideo.srcObject = null;
+        myVideoContainer.removeChild(localVideo);
+        localVideo = null;
+        for(var peer_id in peers) {
+            handleGuestLeft(peer_id);
+        }
     }
     connection.close();
     connection = null;
