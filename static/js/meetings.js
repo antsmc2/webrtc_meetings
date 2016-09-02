@@ -8,6 +8,7 @@ var myHostname = window.location.hostname;
 var myPort = window.location.port;
 console.log("Hostname: " + myHostname);
 var uniqueId = null;
+var myName = '';
 var serverUrl = null;
 var localStream = null;
 var iceURI = null;
@@ -26,16 +27,23 @@ minWidthInput.onchange = maxWidthInput.onchange =
 var getUserMediaConstraintsDiv =
     document.querySelector('div#getUserMediaConstraints');
 var fileInput = document.querySelector('input#fileInput');
-var downloadAnchor = document.querySelector('a#download');
+var downloadSection = document.querySelector('#downloads');
 var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
-var statusMessage = document.querySelector('span#status');
+var statusMessage = document.querySelector('span#fileStatus');
 var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
 var toggleCallButton = document.getElementById('toggleCall');
+var receiveProgressLabel = document.getElementById("receiveProgressLabel");
+var chatPane = document.getElementById("chatPane");
 toggleCallButton.onclick = toggleCall;
 muteVideoButton.onclick = toggleMuteVideo;
 muteAudioButton.onclick = toggleMuteAudio;
+var chatBox = document.querySelector('#chatControls #text');
+var sendMsgButton = document.querySelector('#chatControls #send');
+var setNameButton = document.querySelector('#setName');
+var myNameField = document.querySelector('#myName');
+var myNameStatus = document.querySelector('#myNameStatus');
 
 
 fileInput.onchange = function () {
@@ -76,6 +84,7 @@ var TEXT_MESSAGE = 'TEXT-MESSAGE'
 var SERVER_NOTICE = 1
 var PEER_TEXT = 2
 var PEER_BINARY = 3
+var MY_MESSAGES = 4
 //------------------//
 var iceServers;
 function getIceServers() {
@@ -109,7 +118,7 @@ function getUserMediaConstraints() {
   }
   if (framerateInput.value !== '0') {
     constraints.video.frameRate = {};
-    constraints.video.frameRate.min = framerateInput.value;
+    constraints.video.frameRate.max = framerateInput.value;
   } 
   return constraints;
 }
@@ -166,7 +175,10 @@ function sendThroughServer(msg) {
 
 function connect(ice_uri) {
   iceURI = ice_uri;
-  uniqueId = generateUniqueId();
+  if(!uniqueId)
+    uniqueId = generateUniqueId();
+  if(!myName)
+    myName = uniqueId;
   var scheme = "ws";
 
   // If this is an HTTPS connection, we have to use a secure WebSocket
@@ -555,17 +567,17 @@ function setUpDataChannel(peer_id) {
 
   dataChannel.onopen = function () {
     trace(peer_id + ' Send channel state is: ' + dataChannel.readyState);
-    updateChat({text: 'Connected to ' + peer_id});
+    updateChat({text: peer_id+ " now Connected.", id: uniqueId, type: SERVER_NOTICE});
     enableChat();
   };
 
   dataChannel.onclose = function () {
     trace(peer_id + ": The Data Channel is Closed");
     handleGuestLeft(peer_id);
+    updateChat({text: peer_id+ " Left.", id: uniqueId, type: SERVER_NOTICE});
   };
   trace('done setting up channel: '+ peer_id);
 }
-
 
 
 function onReceiveDataChannelMessage(event, peer_id) {
@@ -573,10 +585,7 @@ function onReceiveDataChannelMessage(event, peer_id) {
     var msg = JSON.parse(event.data);
     switch(msg['msgType']) {
         case PEER_TEXT:
-            updateChat(msg, PEER_TEXT);
-            break;
-        case "hang-up":
-            handleHangUpMsg(msg);
+            updateChat(msg);
             break;
         case PEER_BINARY:
             handleReceivedBinaryMessage(msg);
@@ -585,6 +594,7 @@ function onReceiveDataChannelMessage(event, peer_id) {
 };
 
 function handleReceivedBinaryMessage(msg) {
+  var downloadAnchor = document.createElement('a');
 
   msg['payload'] = base64ToArrayBuffer(msg['payload']);
   if(!(msg['sendId'] in receivedFiles)){
@@ -600,6 +610,7 @@ function handleReceivedBinaryMessage(msg) {
      downloadAnchor.href = '';
      downloadAnchor.download = '';
      downloadAnchor.textContent = '';
+     receiveProgressLabel.textContent = 'Incoming from ' + msg['sender'] + '(' + msg['fileName'] + '): ';
   }
   receivedFiles[msg['sendId']]['payload'].push(msg['payload']);
   receivedFiles[msg['sendId']]['size'] += msg['payload'].byteLength;
@@ -616,7 +627,8 @@ function handleReceivedBinaryMessage(msg) {
     downloadAnchor.textContent =
       'Click to download \'' + msg['fileName'] + '\' (' + formatBytes(msg['fileSize']) + ')';
     downloadAnchor.style.display = 'block';
-
+    downloadSection.appendChild(downloadAnchor);
+    receiveProgressLabel.textContent = 'Receive progress: ';
   }
 }
 
@@ -631,16 +643,42 @@ function formatBytes(bytes,decimals) {
 }
 
 
-function updateChat(msg, text_type) {
-
+function updateChat(msg)
+{
+  if(!(msg.text && msg.text.trim()))
+    return;
+  var date = Date.now();
+  if(msg.date)
+    date = msg.date;
+  var time = new Date(date);
+  var timeStr = time.toLocaleTimeString();
+  var className = ''
+  var name = msg.name ? msg.name : '';
+  switch(msg.type){
+    case MY_MESSAGES:
+      className = 'myChats';
+      break;
+    case SERVER_NOTICE:
+      className = 'notification';
+      break;
+    case PEER_TEXT:
+      className = 'peerMsg'
+  }
+  var text = '<span class="' + className + '">(' + timeStr + ') <b>' + name + '</b>: ' + msg.text + '<br></span>';
+  chatPane.innerHTML = chatPane.innerHTML + '<p class="chat">' + text + '</p>';
+  document.querySelector('#chatPane .chat:last-of-type').scrollIntoView();
 }
 
-function enableChat() {
 
+function enableChat() {
+    sendMsgButton.disabled = false;
+    chatBox.disabled = false;
 }
 
 function disableChat() {
-
+    //dont expect to disabe the chat after it has been enabled initially
+    sendMsgButton.disabled = true;
+    chatBox.disabled = true;
 }
 
 
@@ -652,7 +690,6 @@ function sendData() {
 
   // Handle 0 size files.
   statusMessage.textContent = '';
-  downloadAnchor.textContent = '';
   if (file.size === 0) {
     bitrateDiv.innerHTML = '';
     statusMessage.textContent = 'File is empty, please select a non-empty file';
@@ -666,14 +703,18 @@ function sendData() {
     reader.onload = (function() {
       return function(e) {
         for(var peer_id in dataChannels) {
-            trace('sending ' + e.target.result);
-            var piece = {'msgType': PEER_BINARY, 'payload': arrayBufferToBase64(e.target.result),
-                                    'sender': uniqueId, 'fileName': file.name,
-                                    'offset': offset, 'fileSize': file.size, 'uploaded': new Date(),
-                                    'sendId': sendId};
-            piece = JSON.stringify(piece);
-            trace('sending: ' + piece);
-            dataChannels[peer_id].send(piece);
+           try{
+                trace('sending ' + e.target.result);
+                var piece = {'msgType': PEER_BINARY, 'payload': arrayBufferToBase64(e.target.result),
+                                        'sender': uniqueId, 'fileName': file.name,
+                                        'offset': offset, 'fileSize': file.size, 'uploaded': new Date(),
+                                        'sendId': sendId, 'sender': myName};
+                piece = JSON.stringify(piece);
+                trace('sending: ' + piece);
+                dataChannels[peer_id].send(piece);
+            }catch(e){
+               trace(peer_id + ' unable to send: ' + offset + 'error '+ e);
+            }
          }
         if (file.size > offset + e.target.result.byteLength)
           window.setTimeout(sliceFile, 0, offset + chunkSize);
@@ -781,10 +822,62 @@ function enableButtons() {
     muteVideoButton.disabled = false;
     toggleCallButton.disabled = false;
     fileInput.disabled = false;
+    //inverse for name setting enablement :)
+    myNameField.disabled = true;
+    setNameButton.disabled = true;
 }
 
 function disableButtons() {
     muteAudioButton.disabled = true;
     muteVideoButton.disabled = true;
     fileInput.disabled = true;
+    //inverse for name setting enablement :)
+    myNameField.disabled = false;
+    setNameButton.disabled = false;
+}
+
+// Handles a click on the Send button (or pressing return/enter) by
+// building a "message" object and sending it to the server.
+function handleSendButton() {
+  var msg = {
+    text: chatBox.value,
+    msgType: PEER_TEXT,
+    id: uniqueId,
+    name: myName,
+    date: Date.now()
+  };
+  chatBox.value = "";
+  var time = new Date(msg.date);
+  var timeStr = time.toLocaleTimeString();
+  if (msg.text.length) {
+      for(var peer_id in dataChannels) {
+      //simply try to send for each. Its okay if any one fails
+          try {
+                trace('sending to ' + peer_id);
+                dataChannels[peer_id].send(JSON.stringify(msg));
+          }catch(e) {
+              trace(peer_id + ' Error sending msg: ' + e);
+          }
+      }
+      updateChat(msg);
+  }
+}
+
+
+// Handler for keyboard events. This is used to intercept the return and
+// enter keys so that we can call send() to transmit the entered text
+// to the server.
+function handleKey(evt) {
+  if (evt.keyCode === 13 || evt.keyCode === 14) {
+    if (!sendMsgButton.disabled) {
+      handleSendButton();
+    }
+  }
+}
+
+function saveMyName() {
+    myName = myNameField.value + '-' + uniqueId;
+    trace('my name now set to: ' + myName);
+    myNameStatus.textContent = 'saved!';
+    setTimeout(function(){ myNameStatus.textContent = ''; }, 1000);
 }

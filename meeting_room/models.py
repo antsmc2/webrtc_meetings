@@ -18,8 +18,8 @@ class Meeting(Base):
     duration = models.PositiveIntegerField(help_text='Choose duration in minutes for which the meeting shall be active')
     end_date = models.DateTimeField(null=True, blank=True, editable=False)
     room_id = models.CharField(max_length=200, editable=False, blank=True, null=True, db_index=True, unique=True)
-    description = models.TextField(null=True, blank=True, help_text='Enter brief description of the meeting (Optional)')
-
+    description = models.TextField(default='', null=True, blank=True,
+                                   help_text='Enter brief description of the meeting (Optional)')
 
     def _setup(self):
         if self.room_id is None:
@@ -28,9 +28,9 @@ class Meeting(Base):
 
     def meeting_url(self):
         '''
-            This shall avail the url which shall be used to access the meeting room.
-            Typically, it shall be available until only until the meeting has ended
-            For now, only until there is an it's only when there is an end date.
+        This shall avail the url which shall be used to access the meeting room.
+        Typically, it shall be available until only until the meeting has ended
+        For now, only until there is an it's only when there is an end date.
         :return:
         '''
         if self.activation_date < timezone.localtime(timezone.now(), timezone=self.timezone):
@@ -40,5 +40,5 @@ class Meeting(Base):
 
     @classmethod
     def get_meeting(cls, room_id):
-        #throws cls.DoesNotExist
+        # throws cls.DoesNotExist
         return cls.objects.get(Q(room_id=room_id), Q(end_date__isnull=True)| Q(end_date__lte=timezone.now()))

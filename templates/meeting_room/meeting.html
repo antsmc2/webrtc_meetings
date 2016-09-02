@@ -3,41 +3,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{title}}</title>
+    <title>{{meeting.description}}</title>
     <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-    <link type="text/css" href="{% static "css/base.css" %}" />
+    <link rel="stylesheet" href="{% static "css/base.css" %}" />
 </head>
 <body>
     <div id="main">
-        <section id="constraints">
-        <div id="getUserMedia">
-        <div class="input">
-          <h2>Camera settings</h2>
-          <div id="minWidth">
-            <label>Min width <span>300</span>px:</label>
-            <input type="range" min="0" max="1920" value="300">
+        <section  id="constraints">
+            <div id="getUserMedia">
+            <div class="input">
+              <h2>Camera settings</h2>
+              <div id="minWidth">
+                <label>Min width <span>300</span>px:</label>
+                <input type="range" min="0" max="1920" value="300">
+              </div>
+              <div id="maxWidth">
+                <label>Max width <span>640</span>px:</label>
+                <input type="range" min="0" max="1920" value="640">
+              </div>
+              <div id="minHeight">
+                <label>Min height <span>200</span>px:</label>
+                <input type="range" min="0" max="1080" value="200">
+              </div>
+              <div id="maxHeight">
+                <label>Max height <span>480</span>px:</label>
+                <input type="range" min="0" max="1080" value="480">
+              </div>
+              <div id="framerate">
+                <label>Max Frame rate <span>20</span>fps:</label>
+                <input type="range" min="5" max="50" value="20">
+              </div>
+            </div>
+            <div id="getUserMediaConstraints" class="output"></div>
           </div>
-          <div id="maxWidth">
-            <label>Max width <span>640</span>px:</label>
-            <input type="range" min="0" max="1920" value="640">
-          </div>
-          <div id="minHeight">
-            <label>Min height <span>200</span>px:</label>
-            <input type="range" min="0" max="1080" value="200">
-          </div>
-          <div id="maxHeight">
-            <label>Max height <span>480</span>px:</label>
-            <input type="range" min="0" max="1080" value="480">
-          </div>
-          <div id="framerate">
-            <label>Frame rate <span>20</span>fps:</label>
-            <input type="range" min="5" max="50" value="20">
-          </div>
-        </div>
-        <div id="getUserMediaConstraints" class="output"></div>
-      </div>
-
     </section>
+    <section id="personalization">
+        <div>
+            <label>Set Name</label>
+            <input id="myName" type="text" />
+            <button id="setName" onclick="saveMyName();">save</button><span id="myNameStatus"></span>
+        </div>
+    </section>
+    <section id="chatSection">
+        <div id="chatPane"><p id="welcome">Connecting...</p></div>
+        <div id="chatControls">
+            <div class="flexChild" id="chat-controls-container">
+                Chat: <input id="text" type="text" name="text" size="80" maxlength="256"
+                  placeholder="Enter post here" autocomplete="off" onkeyup="handleKey(event)"
+                   disabled="disabled"/>
+                <button id="send" onclick="handleSendButton();" disabled="disabled">Send</button>
+              </div>
+        </div>
+    </section>
+    <section id="avSection">
         <div id="webtrc">
             <div id="video-settings" class="video">
                 <div id="bandwidth-setting"></div>
@@ -59,16 +77,17 @@
                 </form>
                 <div class="progress">
                     <div class="label">Send progress: </div>
+                    <span id="fileStatus"></span>
                     <progress id="sendProgress" max="0" value="0"></progress>
                 </div>
                   <div id="downloads">
                       <div class="progress">
-                        <div class="label">Receive progress: </div>
+                        <div class="label" id="receiveProgressLabel">Receive progress: </div>
                         <progress id="receiveProgress" max="0" value="0"></progress>
                       </div>
                       <div id="bitrate"></div>
                       <a id="download"></a>
-                      <span id="status"></span>
+
                   </div>
                   <div id="">
                       <button id="muteAudio"  disabled="disabled">Mute Audio</button>
@@ -83,8 +102,11 @@
                   <div id="restart">
                       <button id="toggleCall" disabled="disabled">Disconnect</button>
                   </div>
+
             </div>
         </div>
+        </section>
+
     </div>
     <script type="text/javascript" src="{% static "js/common.js" %}"></script>
     <script type="text/javascript" src="{% static "js/recording.js" %}"></script>
