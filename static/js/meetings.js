@@ -26,13 +26,14 @@ minWidthInput.onchange = maxWidthInput.onchange =
 var getUserMediaConstraintsDiv =
     document.querySelector('div#getUserMediaConstraints');
 var fileInput = document.querySelector('input#fileInput');
-var downloadAnchor = document.querySelector('a#download');
+var downloadSection = document.querySelector('#downloads');
 var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
-var statusMessage = document.querySelector('span#status');
+var statusMessage = document.querySelector('span#fileStatus');
 var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
 var toggleCallButton = document.getElementById('toggleCall');
+var receiveProgressLabel = document.getElementById("receiveProgressLabel");
 toggleCallButton.onclick = toggleCall;
 muteVideoButton.onclick = toggleMuteVideo;
 muteAudioButton.onclick = toggleMuteAudio;
@@ -585,6 +586,7 @@ function onReceiveDataChannelMessage(event, peer_id) {
 };
 
 function handleReceivedBinaryMessage(msg) {
+  var downloadAnchor = document.createElement('a');
 
   msg['payload'] = base64ToArrayBuffer(msg['payload']);
   if(!(msg['sendId'] in receivedFiles)){
@@ -599,9 +601,26 @@ function handleReceivedBinaryMessage(msg) {
      receiveProgress.max = msg['fileSize'];
      downloadAnchor.href = '';
      downloadAnchor.download = '';
-     downloadAnchor.textContent = 'Click to download \'' + msg['fileName'] + '\' (' + formatBytes(msg['fileSize']) + ')';
-     downloadAnchor.style.display = 'block';
+     downloadAnchor.textContent = '';
+     receiveProgressLabel.textContent = 'Receive progress (' + msg['fileName'] + '): ';
+  }
+  receivedFiles[msg['sendId']]['payload'].push(msg['payload']);
+  receivedFiles[msg['sendId']]['size'] += msg['payload'].byteLength;
+  var receivedSize = receivedFiles[msg['sendId']]['size'];
+  receiveProgress.value = receivedFiles[msg['sendId']]['size'];
 
+  // we are assuming that our signaling protocol told
+  // about the expected file size (and name, hash, etc).
+  if (receivedSize === msg['fileSize']) {
+    var received = new window.Blob(receivedFiles[msg['sendId']]['payload']);
+
+    downloadAnchor.href = URL.createObjectURL(received);
+    downloadAnchor.download = msg['fileName'];
+    downloadAnchor.textContent =
+      'Click to download \'' + msg['fileName'] + '\' (' + formatBytes(msg['fileSize']) + ')';
+    downloadAnchor.style.display = 'block';
+    downloadSection.appendChild(downloadAnchor);
+    receiveProgressLabel.textContent = 'Receive progress: ';
   }
 }
 
@@ -637,7 +656,6 @@ function sendData() {
 
   // Handle 0 size files.
   statusMessage.textContent = '';
-  downloadAnchor.textContent = '';
   if (file.size === 0) {
     bitrateDiv.innerHTML = '';
     statusMessage.textContent = 'File is empty, please select a non-empty file';
