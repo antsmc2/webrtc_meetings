@@ -1,0 +1,240 @@
+/* START - Overwrites */
+html, body {
+    background: #3a6ea5;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    font-family: Tahoma !important;
+    font-size: 0.8em !important;
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+* {
+    outline: 0 !important;
+    outline: none !important;
+}
+.ui-widget {
+    font-family: Tahoma;
+}
+
+.ui-dialog {
+    background: #d4d0c8;
+    padding: 0;
+    border-radius: 0;
+    border-top: #eae6dc solid 2px;
+    border-left: #fffff9 solid 2px;
+    border-bottom: #504b46 solid 2px;
+    border-right: #504b46 solid 2px;
+    font-family: Tahoma !important;
+}
+
+.ui-dialog-titlebar {
+    color: #dedede;
+    height: 16px;
+    line-height: 16px;
+    padding: 3px 0 3px 5px !important;
+    border-radius: 0 !important;
+    border: 0;
+    cursor: pointer;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    background: #818084; /* Old browsers */
+    background: -moz-linear-gradient(left, #818084 0%, #c6c5c3 100%, #c6c5c3 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#818084), color-stop(100%,#c6c5c3), color-stop(100%,#c6c5c3)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #818084 0%,#c6c5c3 100%,#c6c5c3 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #818084 0%,#c6c5c3 100%,#c6c5c3 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #818084 0%,#c6c5c3 100%,#c6c5c3 100%); /* IE10+ */
+    background: linear-gradient(to right, #818084 0%,#c6c5c3 100%,#c6c5c3 100%); /* W3C */
+}
+
+button.ui-dialog-titlebar-close {
+    position: relative !important;
+    display: block !important;
+    float: right !important;
+    height: 17px !important;
+    width: 19px !important;
+    background: #d4d0c8 !important;
+    padding: 0 !important;
+    margin: -8px 0 0 2px !important;
+    border-radius: 0 !important;
+    border-top: #eae6dc solid 2px !important;
+    border-left: #fffff9 solid 2px !important;
+    border-bottom: #504b46 solid 2px !important;
+    border-right: #504b46 solid 2px !important;
+}
+
+button.ui-dialog-titlebar-close:active {
+    background-color: #e9e7e5 !important;
+    border-top: #3d3e40 solid 2px !important;
+    border-left: #3d3e40 solid 2px !important;
+    border-bottom: #f8f7f6 solid 2px !important;
+    border-right: #f8f7f6 solid 2px !important;
+}
+
+.ui-dialog-title {
+    width: calc(100% - 90px) !important;
+    margin: 0 !important;
+    height: 16px !important;
+    padding: 0 0 0 20px !important;
+    background: url('images/windows_icons.png') no-repeat !important;
+    background-position: -16px -16px !important;
+}
+
+.ui-state-default .ui-icon {
+    background-image: url('images/icons.png') !important;
+}
+
+span.ui-icon-closethick {
+    background-position: -160px -16px;
+}
+
+span.ui-icon-closethick:active, button.ui-dialog-titlebar-close:active>span.ui-icon-closethick {
+    background-position: -159px -15px;
+}
+
+/* END - Overwrites */
+
+/* START - Focus */
+div.lwd-window-focus .ui-dialog-titlebar {
+    background: #0b256b; /* Old browsers */
+    background: -moz-linear-gradient(left, #0b256b 0%, #a3c8ef 100%, #7db9e8 100%) !important; /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#0b256b), color-stop(100%,#a3c8ef), color-stop(100%,#7db9e8)) !important; /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #0b256b 0%,#a3c8ef 100%,#7db9e8 100%) !important; /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #0b256b 0%,#a3c8ef 100%,#7db9e8 100%) !important; /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #0b256b 0%,#a3c8ef 100%,#7db9e8 100%) !important; /* IE10+ */
+    background: linear-gradient(to right, #0b256b 0%,#a3c8ef 100%,#7db9e8 100%) !important; /* W3C */
+}
+/* END - Focus */
+
+/* START - Maximize */
+.topleft {
+    top: 0 !important;
+    left: 0 !important;
+}
+
+button.lwd-window-titlebar-maximize {
+    margin: -8px 0 0 0 !important;
+}
+
+span.ui-icon-maximizethick {
+    background-position: -64px -16px;
+}
+
+span.ui-icon-maximizethick:active, button.ui-dialog-titlebar-close:active>span.ui-icon-maximizethick {
+    background-position: -63px -15px;
+}
+
+button.lwd-window-titlebar-restore {
+    margin: -8px 0 0 0 !important;
+}
+
+span.ui-icon-restorethick {
+    background-position: -112px -16px;
+}
+
+span.ui-icon-restorethick:active, button.ui-dialog-titlebar-close:active>span.ui-icon-restorethick {
+    background-position: -111px -15px;
+}
+/* END - Maximize */
+
+/* START - Minimize */
+button.lwd-window-titlebar-minimize {
+    /*right: 26px !important;*/
+}
+
+span.ui-icon-minimizethick {
+    background-position: -16px -16px;
+}
+
+span.ui-icon-minimizethick:active, button.ui-dialog-titlebar-close:active>span.ui-icon-minimizethick {
+    background-position: -15px -15px;
+}
+
+div.lwd-window-buttonbar {
+    text-align: right !important;
+    float: right;
+    height: 16px;
+    width: 65px;
+    margin: 0 0 0 5px;
+}
+/* END - Minimize */
+
+/* START - Taskbar */
+div#taskbar {
+    background: #d4d0c8;
+    position: absolute;
+    bottom: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 30px;
+    border-top: #fffff9 solid 2px;
+    z-index: 99999;
+}
+
+div#lwd-taskbar-button-container {
+    float: left;
+}
+
+div#lwd-taskbar-clock {
+    float: right;
+    margin: 2px 2px 0 0;
+    height: 12px;
+    padding: 5px 10px 5px 10px;
+    font-size: 1.1em;
+    border-top: #3d3e40 solid 2px !important;
+    border-left: #3d3e40 solid 2px !important;
+    border-bottom: #f8f7f6 solid 2px !important;
+    border-right: #f8f7f6 solid 2px !important;
+}
+
+div#lwd-taskbar-button-container > button, div#taskbar>button {
+    float: left;
+    cursor: pointer;
+    background-color: #d4d0c8;
+    height: 26px;
+    min-width: 70px;
+    padding: 1px 5px 2px 20px;
+    background: url('images/windows_icons.png') no-repeat !important;
+    background-position: -13px -13px !important;
+    margin: 2px 2px 0 2px !important;
+    border-top: #f8f7f6 solid 2px;
+    border-left: #f8f7f6 solid 2px;
+    border-bottom: #3d3e40 solid 2px;
+    border-right: #3d3e40 solid 2px;
+    font-weight: normal !important;
+}
+
+div#lwd-taskbar-button-container > button:active, div#lwd-taskbar-button-container > button.lwd-taskbar-button-focus, div#taskbar>button:active, div#taskbar>button.lwd-taskbar-button-focus {
+    margin: 2px 2px 0 2px !important;
+    padding: 2px 5px 2px 20px !important;
+    background-color: #e9e7e5 !important;
+    background-position: -12px -12px !important;
+    border-top: #3d3e40 solid 2px !important;
+    border-left: #3d3e40 solid 2px !important;
+    border-bottom: #f8f7f6 solid 2px !important;
+    border-right: #f8f7f6 solid 2px !important;
+    outline: none;
+}
+
+button#startbutton {
+    float: left;
+    margin: 2px 2px 0 2px;
+}
+
+div.taskbar-spacer {
+    float: left;
+    height: 24px;
+    width: 0;
+    margin: 4px 2px 0 4px;
+    padding: 0;
+    border-left: #7c7870 2px solid;
+    border-right: #e9e7e5 2px solid;
+}
+/* END - Taskbar */

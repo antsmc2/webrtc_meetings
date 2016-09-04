@@ -1,0 +1,149 @@
+/* START - Overwrites */
+html, body {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    font-family: Arial !important;
+}
+
+.ui-widget-header {
+    background-color: #aaaaaa;
+    background-image: none;
+}
+
+div.ui-dialog-titlebar {
+    padding: 5px 0 5px 10px !important;
+}
+
+/*button.ui-dialog-titlebar-close {
+    position: relative !important;
+    display: block !important;
+    float: right !important;
+}
+
+button.ui-dialog-titlebar-close:focus {
+    outline: none !important;
+    border: 0 !important;
+}*/
+
+.ui-dialog-title {
+    width: calc(100% - 60px) !important;
+}
+
+.ui-button-text:active, .ui-button-text:focus {
+    outline: none !important;
+    border: 0 !important;
+}
+/* END - Overwrites */
+
+/* START - Focus */
+div.lwd-window-focus {
+    border: 1px solid #8a8a8a;
+}
+
+div.lwd-window-focus>.ui-widget-header {
+    background: #f6a828 url('../../../../lib/jquery-ui/themes/default/images/ui-bg_gloss-wave_35_f6a828_500x100.png') repeat-x scroll 50% 50%;
+}
+/* END - Focus */
+
+/* START - Maximize */
+button.lwd-window-titlebar-maximize {
+    /*right: 26px !important;*/
+}
+
+span.ui-icon-maximizethick {
+    background-position: -32px -80px;
+}
+
+button.lwd-window-titlebar-restore {
+    /*right: 26px !important;*/
+}
+
+span.ui-icon-restorethick {
+background-position: -48px -80px;
+}
+/* END - Maximize */
+
+/* START - Minimize */
+button.lwd-window-titlebar-minimize {
+    /*right: 26px !important;*/
+}
+
+span.ui-icon-minimizethick {
+    background-position: -48px -128px;
+}
+
+div.lwd-window-buttonbar {
+    text-align: right !important;
+    float: right;
+    height: 21px;
+    width: 60px;
+    margin: 1px 0;
+}
+/* END - Minimize */
+
+/* START - Taskbar */
+div#taskbar {
+    position: absolute;
+    bottom: 0;
+    background: #eeeeee;
+    width: 100%;
+    height: 44px;
+    border-top: 1px solid #dddddd;
+    z-index: 99999;
+}
+
+div#lwd-taskbar-button-container {
+    float: left;
+}
+
+div#lwd-taskbar-clock {
+    float: right;
+}
+
+/*button.lwd-taskbar-button {
+    float: left;
+    background: #aaaaaa;
+    min-width: 60px;
+    height: 36px !important;
+    padding: 5px 10px 5px 10px !important;
+    margin: 4px 0 0 4px;
+    border: 1px solid #e78f08;
+    border-radius: 4px;
+    overflow: hidden;+
+    color: #ffffff;
+    font-size: 1.1em;
+    line-height: 26px;
+    text-align: left;
+    cursor: pointer;
+}*/
+/*
+button.lwd-taskbar-button:hover {
+    background: #eeeeee;
+    color: #000000;
+}
+
+button.lwd-taskbar-button-focus {
+    background: #f6a828 url('../../../../lib/jquery-ui/themes/default/images/ui-bg_gloss-wave_35_f6a828_500x100.png') repeat-x scroll 50% 50%;
+}
+
+button.lwd-taskbar-button-focus:hover {
+    background: #f6a828 url('../../../../lib/jquery-ui/themes/default/images/ui-bg_gloss-wave_35_f6a828_500x100.png') repeat-x scroll 50% 50%;
+    color: #000000;
+}
+*/
+div#lwd-taskbar-clock {
+    float: right;
+    margin: 8px 10px 0 0;
+    padding: 5px 10px 5px 10px;
+    font-size: 0.8em;
+    border-top: #3d3e40 solid 1px !important;
+    border-left: #3d3e40 solid 1px !important;
+    border-bottom: #f8f7f6 solid 1px !important;
+    border-right: #f8f7f6 solid 1px !important;
+}
+/* END - Taskbar */
