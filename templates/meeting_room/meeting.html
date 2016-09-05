@@ -15,7 +15,7 @@
   <script data-require="jquery@*" data-semver="2.1.1" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <link rel="stylesheet" href="/static/assets/style.css" />
   <script src="/static/assets/script.js"></script>
-  <link href="/static/assets/myth.css" media="all" rel="stylesheet" type="text/css">
+ <link href="/static/assets/myth.css" media="all" rel="stylesheet" type="text/css">
     <link href="/static/assets/separatedcs.css" media="all" rel="stylesheet" type="text/css">
  <style type="text/css">
     @keyframes resizeanim { from { opacity: 0; } to { opacity: 0; } } .resize-triggers { animation: 1ms resizeanim; visibility: hidden; opacity: 0; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: " "; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }
@@ -51,50 +51,27 @@ h5 {
 	font-size: 12%;
 	color: #FFF;
 }
+
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
     </style>
     
-
 </head>
-
 <body style="position: relative; min-height: 100%; top: 0px; margin-top: 0px;">
 <div class="window" data-title="Your Cam" data-width="220">
  <div id="main">
-        <section  id="constraints">
-            <div id="getUserMedia">
-            <div class="input">
-              <h2>Camera settings</h2>
-              <div id="minWidth">
-                <label>Min width <span>300</span>px:</label>
-                <input type="range" min="0" max="1920" value="300">
-              </div>
-              <div id="maxWidth">
-                <label>Max width <span>640</span>px:</label>
-                <input type="range" min="0" max="1920" value="640">
-              </div>
-              <div id="minHeight">
-                <label>Min height <span>200</span>px:</label>
-                <input type="range" min="0" max="1080" value="200">
-              </div>
-              <div id="maxHeight">
-                <label>Max height <span>480</span>px:</label>
-                <input type="range" min="0" max="1080" value="480">
-              </div>
-              <div id="framerate">
-                <label>Max Frame rate <span>20</span>fps:</label>
-                <input type="range" min="5" max="50" value="20">
-              </div>
-            </div>
-            <div id="getUserMediaConstraints" class="output"></div>
-          </div>
-    </section>
-    <section id="personalization">
-        <div>
-            <label>Set Name</label>
-            <input id="myName" type="text" />
-            <button id="setName" onclick="saveMyName();">save</button><span id="myNameStatus"></span>
-        </div>
-    </section>
-    <section id="chatSection">
+
+   <!--<section id="chatSection">
         <div id="chatPane"><p id="welcome">Connecting...</p></div>
         <div id="chatControls">
             <div class="flexChild" id="chat-controls-container">
@@ -104,16 +81,10 @@ h5 {
                 <button id="send" onclick="handleSendButton();" disabled="disabled">Send</button>
               </div>
         </div>
-    </section>
+    </section>-->
     <section id="avSection">
         <div id="webtrc">
-            <div id="video-settings" class="video">
-                <div id="bandwidth-setting"></div>
-                <div id="toggle-audio"></div>
-                <div id="toggle-video"></div>
-                <div id="record-call"></div>
-            </div>
-            <div id="all-video">
+           <div id="all-video">
                 <div id="myVideoContainer"></div>
                 <div id="videoContainer" class="video">
                 </div>
@@ -121,7 +92,7 @@ h5 {
 
                 </div>
             </div>
-            <div id="file-share" class="file-share">
+            <div id="file-share" class="file-share" style="display: none;">
                 <form id="fileInfo">
                     <input type="file" id="fileInput" name="files" disabled="disabled"/>
                 </form>
@@ -155,6 +126,13 @@ h5 {
 
             </div>
         </div>
+        
+ <!-- video controls="controls" 
+       class="video-stream" 
+       x-webkit-airplay="allow" 
+       data-youtube-id="N9oxmRT2YWw" 
+       src="https://youtu.be/EQIefCVeOU8" width="100%" height="100%"></video -->
+        
         </section>
 
     </div>
@@ -176,13 +154,66 @@ h5 {
           </div>
       <ul class="clroom-nav">
         
+         <li data-show-as="admin-presenter" style="">
+          <div data-ng-controller="DemoController" data-ng-init="init(5)">
+    <div class="well2">
+    
+  
+<h1></h1>
+
+
+    </div>
+   
+     </div>
+     </li>
+        
         <li data-show-as="admin-presenter" style="">
           <div data-ng-controller="DemoController" data-ng-init="init(1)">
     <div class="well2">
-       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" data-ng-if="status==true" data-ng-click="changeStatus();" class="active" fill="#3ec732"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg> 
+       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" data-ng-if="callStatus==true" data-ng-click="disconnectCall();" class="active" fill="#ed0000">
+		<g>
+			<path d="M17.5,4c5.872,0,8.5,4.269,8.5,8.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C27,7.771,24.062,3,17.5,3
+		C17.224,3,17,3.224,17,3.5S17.224,4,17.5,4z"/>
+			<path d="M17.5,9c2.893,0,3.5,1.903,3.5,3.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C22,9.64,20.359,8,17.5,8
+		C17.224,8,17,8.224,17,8.5S17.224,9,17.5,9z"/>
+			<path d="M25.25,19c-1.524,0-3.548-0.49-4.813-0.907c-0.606-0.21-1.357-0.019-1.727,0.365l-2.751,1.957
+		c-3.174-1.678-5.191-3.688-6.85-6.826l2.372-2.46c0.467-0.467,0.635-1.148,0.434-1.786C11.308,7.503,11,5.957,11,4.75
+		C11,3.785,10.215,3,9.25,3h-4.5C3.785,3,3,3.785,3,4.75C3,16.811,13.189,27,25.25,27c0.965,0,1.75-0.785,1.75-1.75v-4.5
+		C27,19.785,26.215,19,25.25,19z"/>
+		</g>
+      </svg> 
       
  
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"   data-ng-if="status == false" data-ng-click="changeStatus();" class="inactive" fill="#ed0000">
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"   data-ng-if="callStatus==false" data-ng-click="connectCall();" class="inactive" fill="#3ec732">
+		<g>
+			<path d="M17.5,4c5.872,0,8.5,4.269,8.5,8.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C27,7.771,24.062,3,17.5,3
+		C17.224,3,17,3.224,17,3.5S17.224,4,17.5,4z"/>
+			<path d="M17.5,9c2.893,0,3.5,1.903,3.5,3.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C22,9.64,20.359,8,17.5,8
+		C17.224,8,17,8.224,17,8.5S17.224,9,17.5,9z"/>
+			<path d="M25.25,19c-1.524,0-3.548-0.49-4.813-0.907c-0.606-0.21-1.357-0.019-1.727,0.365l-2.751,1.957
+		c-3.174-1.678-5.191-3.688-6.85-6.826l2.372-2.46c0.467-0.467,0.635-1.148,0.434-1.786C11.308,7.503,11,5.957,11,4.75
+		C11,3.785,10.215,3,9.25,3h-4.5C3.785,3,3,3.785,3,4.75C3,16.811,13.189,27,25.25,27c0.965,0,1.75-0.785,1.75-1.75v-4.5
+		C27,19.785,26.215,19,25.25,19z"/>
+		</g>
+</svg>
+   
+
+
+  
+<h1></h1>
+
+
+    </div>
+   
+     </div>
+     </li>
+        <li data-show-as="admin-presenter" style="">
+          <div data-ng-controller="DemoController" data-ng-init="init(1)">
+    <div class="well2">
+       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" data-ng-if="muteVideoStatus==true" data-ng-click="muteVideo();" class="active" fill="#3ec732"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg> 
+      
+ 
+ <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"   data-ng-if="muteVideoStatus==false" data-ng-click="unMuteVideo();" class="inactive" fill="#ed0000">
  <path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>
    
 
@@ -199,14 +230,14 @@ h5 {
         <li data-show-as="admin-presenter" style="">
         <div data-ng-controller="DemoController" data-ng-init="init(2)">
     <div class="well2">
-     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_4" x="0px" y="0px" viewbox="0 0 475.085 475.085" style="enable-background:new 0 0 475.085 475.085;" xml:space="preserve" data-ng-if="status == true" data-ng-click="changeStatus();" class="active">
+     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_4" x="0px" y="0px" viewbox="0 0 475.085 475.085" style="enable-background:new 0 0 475.085 475.085;" xml:space="preserve" data-ng-if="muteAudioStatus==true" data-ng-click="muteAudio();" class="active">
 
 		<path d="M237.541,328.897c25.128,0,46.632-8.946,64.523-26.83c17.888-17.884,26.833-39.399,26.833-64.525V91.365    c0-25.126-8.938-46.632-26.833-64.525C284.173,8.951,262.669,0,237.541,0c-25.125,0-46.632,8.951-64.524,26.84    c-17.893,17.89-26.838,39.399-26.838,64.525v146.177c0,25.125,8.949,46.641,26.838,64.525    C190.906,319.951,212.416,328.897,237.541,328.897z" fill="#08ef08"/>
 		<path d="M396.563,188.15c-3.606-3.617-7.898-5.426-12.847-5.426c-4.944,0-9.226,1.809-12.847,5.426    c-3.613,3.616-5.421,7.898-5.421,12.845v36.547c0,35.214-12.518,65.333-37.548,90.362c-25.022,25.03-55.145,37.545-90.36,37.545    c-35.214,0-65.334-12.515-90.365-37.545c-25.028-25.022-37.541-55.147-37.541-90.362v-36.547c0-4.947-1.809-9.229-5.424-12.845    c-3.617-3.617-7.895-5.426-12.847-5.426c-4.952,0-9.235,1.809-12.85,5.426c-3.618,3.616-5.426,7.898-5.426,12.845v36.547    c0,42.065,14.04,78.659,42.112,109.776c28.073,31.118,62.762,48.961,104.068,53.526v37.691h-73.089    c-4.949,0-9.231,1.811-12.847,5.428c-3.617,3.614-5.426,7.898-5.426,12.847c0,4.941,1.809,9.233,5.426,12.847    c3.616,3.614,7.898,5.428,12.847,5.428h182.719c4.948,0,9.236-1.813,12.847-5.428c3.621-3.613,5.431-7.905,5.431-12.847    c0-4.948-1.81-9.232-5.431-12.847c-3.61-3.617-7.898-5.428-12.847-5.428h-73.08v-37.691    c41.299-4.565,75.985-22.408,104.061-53.526c28.076-31.117,42.12-67.711,42.12-109.776v-36.547    C401.998,196.049,400.185,191.77,396.563,188.15z" fill="#08ef08"/>
 
 </svg>
 
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_2" x="0px" y="0px" viewbox="0 0 475.092 475.092" style="enable-background:new 0 0 475.092 475.092;" xml:space="preserve" data-ng-if="status == false" data-ng-click="changeStatus();" class="inactive">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_2" x="0px" y="0px" viewbox="0 0 475.092 475.092" style="enable-background:new 0 0 475.092 475.092;" xml:space="preserve" data-ng-if="muteAudioStatus==false" data-ng-click="unMuteAudio();" class="inactive">
 
 		<path d="M113.922,269.803c-2.856-11.419-4.283-22.172-4.283-32.26v-36.55c0-4.947-1.809-9.229-5.424-12.847    c-3.617-3.616-7.898-5.424-12.847-5.424c-4.952,0-9.235,1.809-12.851,5.424c-3.617,3.617-5.426,7.9-5.426,12.847v36.547    c0,21.129,3.999,41.494,11.993,61.106L113.922,269.803z" fill="#D80027"/>
 		<path d="M237.545,328.897c25.126,0,46.638-8.946,64.521-26.83c17.891-17.884,26.837-39.399,26.837-64.525v-36.547L431.972,97.929    c1.902-1.903,2.854-4.093,2.854-6.567c0-2.474-0.952-4.664-2.854-6.567l-23.407-23.413c-1.91-1.906-4.097-2.856-6.57-2.856    c-2.472,0-4.661,0.95-6.564,2.856L43.117,413.698c-1.903,1.902-2.852,4.093-2.852,6.563c0,2.478,0.949,4.668,2.852,6.57    l23.411,23.411c1.904,1.903,4.095,2.851,6.567,2.851c2.475,0,4.665-0.947,6.567-2.851l72.519-72.519    c20.933,12.949,43.299,20.656,67.093,23.127v37.691h-73.089c-4.949,0-9.235,1.811-12.847,5.428    c-3.618,3.613-5.43,7.898-5.43,12.847c0,4.941,1.812,9.233,5.43,12.847c3.612,3.614,7.898,5.428,12.847,5.428h182.718    c4.948,0,9.232-1.813,12.847-5.428c3.62-3.613,5.428-7.905,5.428-12.847c0-4.948-1.808-9.233-5.428-12.847    c-3.614-3.617-7.898-5.428-12.847-5.428h-73.087v-37.691c41.302-4.565,75.988-22.408,104.067-53.526    c28.072-31.117,42.11-67.711,42.11-109.776v-36.554c0-4.947-1.808-9.229-5.421-12.845c-3.621-3.617-7.902-5.426-12.851-5.426    c-4.945,0-9.229,1.809-12.847,5.426c-3.617,3.616-5.424,7.898-5.424,12.845v36.547c0,35.214-12.519,65.333-37.545,90.359    s-55.151,37.544-90.362,37.544c-20.557,0-40.065-4.849-58.529-14.561l27.408-27.401    C216.707,327.097,227.079,328.897,237.545,328.897z" fill="#D80027"/>
@@ -220,10 +251,10 @@ h5 {
         <li data-show-as="admin-presenter" style="">
 <div data-ng-controller="DemoController" data-ng-init="init(3)">
     <div class="well2">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_3" x="0px" y="0px" viewbox="0 0 455 455" style="enable-background:new 0 0 455 455;" xml:space="preserve" width="20px" height="20px"  data-ng-if="status == true" data-ng-click="changeStatus();" class="active">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_3" x="0px" y="0px" viewbox="0 0 455 455" style="enable-background:new 0 0 455 455;" xml:space="preserve" width="20px" height="20px"  data-ng-if="startRecordingStatus==true" data-ng-click="startRecording();" class="active">
       <circle cx="227.5" cy="227.5" r="227.5" fill="#D80027"/>
 </svg>
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_3" x="0px" y="0px" viewbox="0 0 27.494 27.494" style="enable-background:new 0 0 27.494 27.494;" xml:space="preserve" width="20px" height="20px" data-ng-if="status == false" data-ng-click="changeStatus();" class="inactive">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_3" x="0px" y="0px" viewbox="0 0 27.494 27.494" style="enable-background:new 0 0 27.494 27.494;" xml:space="preserve" width="20px" height="20px" data-ng-if="startRecordingStatus==false" data-ng-click="stopRecording();" class="inactive">
       
 
 	<g id="c137_pause">
@@ -243,9 +274,42 @@ h5 {
 
 
 <div class="dropdown-content">
-    <a href="#" />Nav1</a>
-    <a href="#" />Nav2</a>
-    <a href="#" />Nav3</a>
+    <section id="personalization">
+        <div>
+            <h2>Set Name</h2>
+            <input id="myName" type="text" />
+            <button class="cusbut" id="setName" onclick="saveMyName();">save</button><span id="myNameStatus"></span>
+        </div>
+    </section>
+    <section  id="constraints">
+            <div id="getUserMedia">
+            <div class="input">
+              <h2>Camera settings</h2>
+              <br />
+              <div id="minWidth">
+                <label>Min width <span>300</span>px:</label>
+                <input type="range" min="0" max="1920" value="300">
+              </div>
+              <div id="maxWidth">
+                <label>Max width <span>640</span>px:</label>
+                <input type="range" min="0" max="1920" value="640">
+              </div>
+              <div id="minHeight">
+                <label>Min height <span>200</span>px:</label>
+                <input type="range" min="0" max="1080" value="200">
+              </div>
+              <div id="maxHeight">
+                <label>Max height <span>480</span>px:</label>
+                <input type="range" min="0" max="1080" value="480">
+              </div>
+              <div id="framerate">
+                <label>Max Frame rate <span>20</span>fps:</label>
+                <input type="range" min="5" max="50" value="20">
+              </div>
+            </div>
+            <div id="getUserMediaConstraints" class="output"></div>
+          </div>
+    </section>
   
 </div>
 
@@ -438,26 +502,7 @@ h5 {
             <!-- mp4 video start -->
           <div class="resize-triggers"><div class="expand-trigger"><div style="width: 1030px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 743px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 1401px; height: 1px;"></div></div><div class="contract-trigger"></div></div></div>
           <ul id="video-list" class="clear video-3 all-audios">
-          <li class="av" id="stream-19c870f2-b62d-4076-83db-88380187eab1"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 48.8189% 15%; width: 545px; left: 0px;" class="video-uname">guest-126
-          <div class="clroom-presenter-signal2">
-          
-          <span class="clroom-mic-on">
-          
-         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewbox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.74-1.69-1.36-2.67-1.85-.33-.16-.56-.5-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg> 
-          </span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div>
-          
-          
-          <div class="clroom-presenter-signal3">
-          
-          <span class="clroom-mic-on">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewbox="0 0 18 18"><path d="M9 13.5c-2.49 0-4.5-2.01-4.5-4.5S6.51 4.5 9 4.5c1.24 0 2.36.52 3.17 1.33L10 8h5V3l-1.76 1.76C12.15 3.68 10.66 3 9 3 5.69 3 3.01 5.69 3.01 9S5.69 15 9 15c2.97 0 5.43-2.16 5.9-5h-1.52c-.46 2-2.24 3.5-4.38 3.5z"/></svg>  
-          </span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div>
-          <div class="clroom-presenter-signal"><span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li><li class="av" id="stream-ac87b453-51c0-4a76-8595-b63d035ec4f1"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 29.9213% 15%; width: 545px; left: 0px;" class="video-uname">guest-193
-          
-          <div class="clroom-presenter-signal">
-         
-          <span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li><li class="av" id="stream-GEqVrDZX0amwV2yf0CUFzW3n85qIz6Ehog2T"><video autoplay="autoplay" src="mediastream:#path" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 29.1339% 15%; width: 545px; left: 0px;" class="video-uname">guest-462<div class="clroom-presenter-signal"><span class="clroom-mic-on"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M23.5,14.5v4.515c0,0.82-0.683,1.485-1.494,1.485H9.993c-0.824,0-1.493-0.677-1.493-1.485V14.5h-3v7.515   c0,0.809,0.676,1.485,1.51,1.485h7.49V28h-6v3h15v-3h-6v-4.5h7.49c0.834,0,1.51-0.665,1.51-1.485V14.5H23.5z"></path><path id="Rectangle-48" d="M11.5,1h9C21.329,1,22,1.672,22,2.5v15c0,0.829-0.671,1.5-1.5,1.5h-9c-0.828,0-1.5-0.671-1.5-1.5v-15   C10,1.672,10.672,1,11.5,1z"></path></svg></span><span class="clroom-mic-mute" style="display: none"><svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="32px" height="32px" viewbox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve"><path d="M22,16.697V2.5C22,1.671,21.329,1,20.5,1h-9C10.672,1,10,1.671,10,2.5v2.197L22,16.697z"></path><path d="M10,15.305V17.5c0,0.829,0.672,1.5,1.5,1.5h2.197L10,15.305z"></path><polygon points="26.5,21.197 26.5,14.5 23.5,14.5 23.5,18.197 "></polygon><path d="M22.697,28H17.5v-4.5h0.697l-3-3H9.993c-0.824,0-1.493-0.677-1.493-1.484V14.5h-3v7.516c0,0.81,0.676,1.484,1.51,1.484h7.49  V28h-6v3h15v-2.197L22.697,28z"></path><rect x="-2.471" y="14.25" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.823 -6.7006)" width="36.941" height="3"></rect></svg></span></div><span class="connected-num"></span></div></li></ul>
+          </ul>
           <ul id="audio-list" class="close">
           </ul>
         </div>
@@ -559,7 +604,7 @@ h5 {
         <!--wait to see if people-wrapper error keep happens
           <li><a id="roomchat_people" class="tab-name tab-name-people" href="#people-wrapper">People&nbsp;</a></li>
         -->
-        <li><a href="javascript:void(0)" class="tab-name tab-name-people" id="roomchat_people">People<span class="unread-count"><i>3</i></span></a></li>
+        <li><a href="javascript:void(0)" class="tab-name tab-name-people" id="roomchat_people">People<span class="unread-count"><i id="peopleCount">1</i></span></a></li>
        
        
       <div class="slick-list draggable" tabindex="0"><div class="slick-track" style="opacity: 1; width: 0px; transform: translate3d(0px, 0px, 0px);"></div></div></ul>
@@ -598,9 +643,7 @@ h5 {
       <div class="prong-lt"></div>
     </div>-->
     <ul class="clroom-groupchat" id="chat-message">
-      <li id="load-more-chats" data-end-index="-1" data-status="enabled"><span></span></li><li id="msg-1470377427366" data-author="EgozXv0whiBkuutjAACD">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="/static/assets/usericon1.jpg"></a>  </div>  
-      <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-462</a>        <div class="clroom-groupchat-date"> · 11:40:27 am</div>      </div>      <div class="clroom-groupchat-text" id="1470377427366">Hi</div>      <ul class="clroom-group-chat-subnav">        <li>          <a href="javascript:void(0);" class="subnav-delete" id="delMsg-1470377427366" onclick="bmRoom.chat.delete('1470377427366')" style="display: block">                     </a>        </li>      </ul>    </div>  </div></li><li id="msg-1470381300347" data-author="AvhHclpvi654ypiGAACP">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="/static/assets/usericon2.jpg"></a>  </div>  <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-777</a>        <div class="clroom-groupchat-date"> · 12:45:00 pm</div>      </div>      <div class="clroom-groupchat-text" id="1470381300347">Hi Guys</div>      <ul class="clroom-group-chat-subnav">        <li>          <a data-hasqtip="0" href="javascript:void(0);" class="subnav-delete" id="delMsg-1470381300347" onclick="bmRoom.chat.delete('1470381300347')" style="display: block">                    </a>        </li>      </ul>    </div>  </div></li><li id="msg-1470381315950" data-author="aeW4nyWaQyCrGzmiAACM">  <div class="clroom-groupchat-img">    <a href="javascript:void(0);"><img src="/static/assets/usericon3.jpg"></a>  </div>  <div class="clroom-groupchat-right">    <div class="clroom-groupchat-right-in">      <div class="clroom-groupchat-name">        <a href="javascript:void(0);">guest-126</a>        <div class="clroom-groupchat-date"> · 12:45:15 pm</div>      </div>      <div class="clroom-groupchat-text" id="1470381315950">hi this is kony</div>      <ul class="clroom-group-chat-subnav">        <li>          <a href="javascript:void(0);" class="subnav-delete" id="delMsg-1470381315950" onclick="bmRoom.chat.delete('1470381315950')" style="display: block">                    </a>        </li>      </ul>    </div>  </div></li>
-    </ul>
+   </ul>
   </div>
 </div>
     
@@ -622,7 +665,12 @@ h5 {
         </div>
         <div id="chat-input" class="clroom-chat-inputbox-border">
           <div class="clroom-groupchat-img">
-            <a href="javascript:void(0)"><img title="" src="assets/4.png" class="" alt=""></a>
+            <a href="javascript:void(0)" onclick="triggerFileSelect();"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_192" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve" width="20px" height="20px" class="active">
+<g>
+	<path d="M26.525,10.5l-4.712-6.582l-0.001-0.001L21.515,3.5H0v53h60v-46H26.525z M58,12.5v5H31.537l-3.579-5H58z M2,54.5v-49   h18.485l5,7h0.012l4.69,6.551c0.195,0.272,0.502,0.417,0.813,0.418V19.5h27v35H2z" fill="#FFFFFF"/>
+	<polygon points="21.293,32.793 22.707,34.207 29,27.914 29,45.5 31,45.5 31,27.914 37.293,34.207 38.707,32.793 30,24.086  " fill="#FFFFFF"/>
+</g>
+</svg></a>
             
           </div>
           <div class="clroom-groupchat-right">
@@ -634,7 +682,9 @@ h5 {
                 </div>
                 <!-- <textarea id="roomchat_group_text" placeholder="Type your message here"></textarea> -->
                 <div id="chat_input_area">
-                  <div id="chat_input" contenteditable="true"><span class="chat-grey">Type your message here...</span></div>
+                  <div id="chat_input" contenteditable="true"><textarea id="chat_input_value" rows="4" cols="50"
+                  placeholder="Enter post here" autocomplete="off" onkeyup="handleKey(event)"
+                   disabled="disabled"> </textarea></div>
                 </div>
               </div>
               <ul class="clroom-chat-input-btu-box">
@@ -643,7 +693,10 @@ h5 {
                 <li><span id="room-at" class=""></span></li>
                 <li id="type_count"></li>
                 <li></li>
-                <li id="post_message_li"><a id="post_message" href="javascript:void(0);">Post</a></li>
+                <li id="post_message_li">
+		
+                <button id="post_message" onclick="handleSendButton();" disabled="disabled">Send</button>	
+		<!-- a id="post_message" href="javascript:void(0);" onclick="handleSendButton();">Post</a --></li>
                 
               </ul>
               <input maxlength="1000" id="chat_input_value" type="hidden">
@@ -723,10 +776,11 @@ h5 {
     <script type="text/javascript" src="/static/lib/jquery-ui/jquery.min.js"></script>
     <script type="text/javascript" src="/static/lib/jquery-ui/jquery-ui.min.js"></script>
     <script type="text/javascript" src="/static/src/jquery-lwd/jquery-lwd.js"></script>
-     <script type="text/javascript" src="{% static "js/common.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/common.js" %}"></script>
     <script type="text/javascript" src="{% static "js/recording.js" %}"></script>
     <script type="text/javascript" src="{% static "js/meetings.js" %}"></script>
-    <script type="text/javascript">
+  
+  <script type="text/javascript"> 
         connect('{{ ice_uri }}');
     </script>
 </body></html>

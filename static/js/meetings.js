@@ -13,9 +13,9 @@ var serverUrl = null;
 var localStream = null;
 var iceURI = null;
 var peers = {};
-var dataChannels = {}
-var remoteVideos = {}
-var receivedFiles = {}
+var dataChannels = {};
+var remoteVideos = {};
+var receivedFiles = {};
 var minWidthInput = document.querySelector('div#minWidth input');
 var maxWidthInput = document.querySelector('div#maxWidth input');
 var minHeightInput = document.querySelector('div#minHeight input');
@@ -35,15 +35,16 @@ var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
 var toggleCallButton = document.getElementById('toggleCall');
 var receiveProgressLabel = document.getElementById("receiveProgressLabel");
-var chatPane = document.getElementById("chatPane");
+var chatPane = document.getElementById("chat-message");
 toggleCallButton.onclick = toggleCall;
 muteVideoButton.onclick = toggleMuteVideo;
 muteAudioButton.onclick = toggleMuteAudio;
-var chatBox = document.querySelector('#chatControls #text');
-var sendMsgButton = document.querySelector('#chatControls #send');
+var chatBox = document.querySelector('#chat_input_value');
+var sendMsgButton = document.querySelector('#post_message');
 var setNameButton = document.querySelector('#setName');
 var myNameField = document.querySelector('#myName');
 var myNameStatus = document.querySelector('#myNameStatus');
+var peopleCount = document.querySelector('#peopleCount');
 
 
 fileInput.onchange = function () {
@@ -61,7 +62,7 @@ var offerOptions = {
   offerToReceiveVideo: 1
 };
 var dataChannelOptions = null;
-var videoContainer = document.getElementById('videoContainer');
+var videoContainer = document.getElementById('video-list');
 var localVideoContainer = document.getElementById('myVideoContainer');
 var localVideo = null;
 /*
@@ -76,15 +77,15 @@ localVideo.addEventListener('loadedmetadata', function() {
 var JOINED_ROOM = 'JOINED-ROOM';
 var OFFER_REQUEST = 'OFFER';
 var OFFER_ANSWER  = 'ANSWER';
-var NEW_ICE_FOUND = 'NEW-ICE-FOUND'
-var TEXT_MESSAGE = 'TEXT-MESSAGE'
+var NEW_ICE_FOUND = 'NEW-ICE-FOUND';
+var TEXT_MESSAGE = 'TEXT-MESSAGE';
 // ---------------------//
 
 //message types //
-var SERVER_NOTICE = 1
-var PEER_TEXT = 2
-var PEER_BINARY = 3
-var MY_MESSAGES = 4
+var SERVER_NOTICE = 1;
+var PEER_TEXT = 2;
+var PEER_BINARY = 3;
+var MY_MESSAGES = 4;
 //------------------//
 var iceServers;
 function getIceServers() {
@@ -151,15 +152,24 @@ function onCreateSessionDescriptionError(error) {
 }
 
 function gotRemoteStream(e, peer_id) {
-  var remoteVideo = document.createElement('video');
+  makeRemoteVideo(peer_id);
+  var remoteVideo = document.getElementById('v'+ peer_id);
   remoteVideo.srcObject = e.stream;
   remoteVideo.src = window.URL.createObjectURL(e.stream);
   remoteVideo.id = peer_id;
+  remoteVideo.class = 'video-stream';
+   remoteVideo.height = '100%';
+  remoteVideo.width = '100%';
   remoteVideo.autoplay = true;
   attachRemoteVideo(peer_id, remoteVideo);
   trace('received remote stream from: ' + peer_id);
 }
 
+function makeRemoteVideo(peer_id) {
+	var video_component = '<li class="av" id="li' + peer_id + '"><video autoplay="autoplay"' + 
+      'id="v' + peer_id + '" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 48.8189% 15%; width: 545px; left: 0px;" class="video-uname">guest-' + peer_id + '</div></li>';
+    videoContainer.innerHTML = videoContainer.innerHTML + video_component;
+}
 
 function sendThroughServer(msg) {
   trace("Sending '" + msg.type + "' message: " + msg);
@@ -183,7 +193,7 @@ function connect(ice_uri) {
 
   // If this is an HTTPS connection, we have to use a secure WebSocket
   // connection too, so add another "s" to the scheme.
-  serverUrl = document.URL;
+  serverUrl = encodeURI(document.URL);
   serverUrl =  serverUrl.replace('http', scheme);
   var req_protocol = document.location.protocol;
   initialize(serverUrl);
@@ -286,6 +296,7 @@ function gotLocalStream(stream) {
   localVideo.src = window.URL.createObjectURL(stream);
   localVideo.srcObject = stream;
   localVideo.id = uniqueId;
+  localVideo.class = 'video-stream';
   localVideo.autoplay = true;
   localVideo.muted = "muted";
   localStream = stream;
@@ -358,15 +369,15 @@ function handleGuestLeft(peer_id) {
 }
 
 function attachRemoteVideo(peer_id, remoteVideo) {
-    videoContainer.appendChild(remoteVideo);
     remoteVideos[peer_id] = remoteVideo;
 }
 
 function removeRemoteVideo(peer_id) {
     if(remoteVideos[peer_id])
     {
-        videoContainer.removeChild(remoteVideos[peer_id]);
         delete remoteVideos[peer_id];
+        var liElement = document.getElementById('li'+peer_id);
+        videoContainer.removeChild(liElement);
     }
 }
 
@@ -426,6 +437,7 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
     //case "disconnected": removing this becos some networks might still recover
       //updateChat({text: peer_id + ' disconnected.'});
       //closeVideoCall();
+      refreshAttendantsCount();
       break;
     case "completed":
     //case "connected":    //stated might be connected but might still get better connection. Thos is allow new ice
@@ -568,6 +580,8 @@ function setUpDataChannel(peer_id) {
   dataChannel.onopen = function () {
     trace(peer_id + ' Send channel state is: ' + dataChannel.readyState);
     updateChat({text: peer_id+ " now Connected.", id: uniqueId, type: SERVER_NOTICE});
+    refreshAttendantsCount();
+    trace('people keys: ' + Object.keys(peers));
     enableChat();
   };
 
@@ -575,8 +589,16 @@ function setUpDataChannel(peer_id) {
     trace(peer_id + ": The Data Channel is Closed");
     handleGuestLeft(peer_id);
     updateChat({text: peer_id+ " Left.", id: uniqueId, type: SERVER_NOTICE});
+    if(Object.keys(peers).length == 0)
+        disableChat();
+    refreshAttendantsCount();
+    trace('people keys: ' + Object.keys(peers));
   };
   trace('done setting up channel: '+ peer_id);
+}
+
+function refreshAttendantsCount() {
+	peopleCount.textContent = Object.keys(peers).length + 1;
 }
 
 
@@ -594,7 +616,9 @@ function onReceiveDataChannelMessage(event, peer_id) {
 };
 
 function handleReceivedBinaryMessage(msg) {
-  var downloadAnchor = document.createElement('a');
+  var downloadAnchor = null; 
+  var progressHTML = null;
+  var receiveProgress = null;
 
   msg['payload'] = base64ToArrayBuffer(msg['payload']);
   if(!(msg['sendId'] in receivedFiles)){
@@ -606,11 +630,17 @@ function handleReceivedBinaryMessage(msg) {
                                         'size': 0,
                                         'expectedSize': msg['fileSize']
                                         };
+     progressHTML = '<span id="fs' + msg['sendId'] + '">' + msg['fileName'] + '</span><progress id="p' + 
+				msg['sendId'] + '" max="0" value="0"></progress><a id="d' + msg['sendId'] + '" />';
+     postToChat(msg['sender'], progressHTML);
+     receiveProgress = document.getElementById('p' + msg['sendId']);
+     receiveProgressLabel = document.getElementById('fs' + msg['sendId']);
      receiveProgress.max = msg['fileSize'];
-     downloadAnchor.href = '';
-     downloadAnchor.download = '';
-     downloadAnchor.textContent = '';
-     receiveProgressLabel.textContent = 'Incoming from ' + msg['sender'] + '(' + msg['fileName'] + '): ';
+     downloadAnchor = document.getElementById('d' + msg['sendId']);
+  } else {
+     receiveProgress = document.getElementById('p' + msg['sendId']);
+     receiveProgressLabel = document.getElementById('fs' + msg['sendId']);
+     downloadAnchor = document.getElementById('d' + msg['sendId']);
   }
   receivedFiles[msg['sendId']]['payload'].push(msg['payload']);
   receivedFiles[msg['sendId']]['size'] += msg['payload'].byteLength;
@@ -627,8 +657,6 @@ function handleReceivedBinaryMessage(msg) {
     downloadAnchor.textContent =
       'Click to download \'' + msg['fileName'] + '\' (' + formatBytes(msg['fileSize']) + ')';
     downloadAnchor.style.display = 'block';
-    downloadSection.appendChild(downloadAnchor);
-    receiveProgressLabel.textContent = 'Receive progress: ';
   }
 }
 
@@ -650,8 +678,6 @@ function updateChat(msg)
   var date = Date.now();
   if(msg.date)
     date = msg.date;
-  var time = new Date(date);
-  var timeStr = time.toLocaleTimeString();
   var className = ''
   var name = msg.name ? msg.name : '';
   switch(msg.type){
@@ -664,9 +690,24 @@ function updateChat(msg)
     case PEER_TEXT:
       className = 'peerMsg'
   }
-  var text = '<span class="' + className + '">(' + timeStr + ') <b>' + name + '</b>: ' + msg.text + '<br></span>';
-  chatPane.innerHTML = chatPane.innerHTML + '<p class="chat">' + text + '</p>';
-  document.querySelector('#chatPane .chat:last-of-type').scrollIntoView();
+//  var text = '<span class="' + className + '">(' + timeStr + ') <b>' + name + '</b>: ' + msg.text + '<br></span>';
+  //chatPane.innerHTML = chatPane.innerHTML + '<p class="chat">' + text + '</p>';
+  //document.querySelector('#chatPane .chat:last-of-type').scrollIntoView();
+  postToChat(name, msg.text, date);
+}
+
+function postToChat(speakerName, content, date) {
+  if(!date)
+	date = Date.now();
+  var time = new Date(date);
+  var timeStr = time.toLocaleTimeString();
+  var text = '<li id="msg-1470377427366" data-author="EgozXv0whiBkuutjAACD" class="chat"><div class="clroom-groupchat-img">' +
+  '<a href="javascript:void(0);"></a></div><div class="clroom-groupchat-right"<div class="clroom-groupchat-right-in">' +
+   '<div class="clroom-groupchat-name"><a href="javascript:void(0);">' + speakerName + '</a><div class="clroom-groupchat-date">'+
+   timeStr + '</div></div><div class="clroom-groupchat-text">' + content + '</div><ul class="clroom-group-chat-subnav">' +
+   '<li><a href="javascript:void(0);" class="subnav-delete" style="display: block"></a></li></ul></div></div></li>';
+  chatPane.innerHTML = chatPane.innerHTML + text;
+  document.querySelector('#chat-message .chat:last-of-type').scrollIntoView();    
 }
 
 
@@ -687,7 +728,11 @@ function sendData() {
   var sendId = uniqueId + '.' + Math.floor((1 + Math.random()) * 0x1000000);
   trace('file is ' + [file.name, file.size, file.type,
       file.lastModifiedDate].join(' '));
-
+  var progressHTML = '<span id="fs' + sendId + '"></span><progress id="p' + sendId +
+				'" max="0" value="0"></progress>';
+  postToChat(myName, progressHTML);
+  var sendProgress = document.getElementById('p' + sendId);
+  var statusMessage = document.getElementById('fs' + sendId);
   // Handle 0 size files.
   statusMessage.textContent = '';
   if (file.size === 0) {
@@ -696,6 +741,7 @@ function sendData() {
     closeDataChannels();
     return;
   }
+  statusMessage.textContent = file.name;
   sendProgress.max = file.size;
   var chunkSize = 10240;
   var sliceFile = function(offset) {
@@ -751,32 +797,44 @@ function base64ToArrayBuffer(base64) {
 
 function muteVideo() {
   if(localStream)
-    localStream.getVideoTracks().forEach(track => track.enabled = !track.enabled);
+    localStream.getVideoTracks().forEach(track => track.enabled = false);
 }
 
 function muteAudio() {
   if(localStream)
-    localStream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
+    localStream.getAudioTracks().forEach(track => track.enabled = false);
+}
+
+function unMuteVideo() {
+  if(localStream)
+    localStream.getVideoTracks().forEach(track => track.enabled = true);
+}
+
+function unMuteAudio() {
+  if(localStream)
+    localStream.getAudioTracks().forEach(track => track.enabled = true);
 }
 
 function toggleMuteVideo() {
    if(muteVideoButton.textContent.toLowerCase() == 'mute video')
    {
         muteVideoButton.textContent = 'Unmute Video';
+        muteVideo();
    }else {
         muteVideoButton.textContent = 'Mute Video';
+        unMuteVideo();
    }
-   muteVideo();
 }
 
 function toggleMuteAudio() {
    if(muteAudioButton.textContent.toLowerCase() == 'mute audio')
    {
         muteAudioButton.textContent = 'Unmute Audio';
+        muteAudio();
    }else {
         muteAudioButton.textContent = 'Mute Audio';
+        unMuteAudio();
    }
-   muteAudio();
 }
 
 function toggleCall() {
@@ -806,6 +864,8 @@ function stopCall() {
     connection = null;
     resetButtons();
     disableButtons();
+    disableChat();
+    refreshAttendantsCount();
 }
 
 function restartCall() {
@@ -825,6 +885,10 @@ function enableButtons() {
     //inverse for name setting enablement :)
     myNameField.disabled = true;
     setNameButton.disabled = true;
+    var camSettings = document.querySelectorAll('#constraints input');
+    for(var i=0; i < camSettings.length; i++) {
+        camSettings[i].disabled = true;
+    }
 }
 
 function disableButtons() {
@@ -834,6 +898,10 @@ function disableButtons() {
     //inverse for name setting enablement :)
     myNameField.disabled = false;
     setNameButton.disabled = false;
+    var camSettings = document.querySelectorAll('#constraints input');
+    for(var i=0; i < camSettings.length; i++) {
+        camSettings[i].disabled = false;
+    }
 }
 
 // Handles a click on the Send button (or pressing return/enter) by
@@ -881,3 +949,10 @@ function saveMyName() {
     myNameStatus.textContent = 'saved!';
     setTimeout(function(){ myNameStatus.textContent = ''; }, 1000);
 }
+
+function triggerFileSelect() {
+    if (!sendMsgButton.disabled)
+   	 fileInput.click();
+    return false;
+}
+
