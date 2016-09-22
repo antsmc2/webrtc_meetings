@@ -10,8 +10,8 @@ $.widget('custom.window', $.ui.dialog, {
         var objThis = this;
         this._super();
 
-        this.options.width = (!isNaN(this.options.width))? this.options.width: 150;
-        this.options.height = (!isNaN(this.options.height))? this.options.height: 150;
+        this.options.width = (!isNaN(this.options.width))? this.options.width: 180;
+        this.options.height = (!isNaN(this.options.height))? this.options.height: 180;
 
         /* START - set position and containment for draggable by appendTo-option */
         if(this.options.appendTo != '' && this.options.appendTo != 'body' && this.options.appendTo != 'window' && $(this.options.appendTo).length > 0){

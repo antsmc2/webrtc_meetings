@@ -205,6 +205,7 @@ function connect(ice_uri) {
        }
   };
  trace('using ice uri: ' + iceURI);
+ trace('ice servers',iceServers);
  xhttp.open("GET", iceURI, true);
  xhttp.send();
  trace('my unique id: ' + uniqueId);
@@ -236,6 +237,7 @@ function initialize(serverUrl, callbacks) {
 function handleServerMsg(msg_string) {
   trace('handle server msg recieved: ' + msg_string);
   var msg = JSON.parse(msg_string);
+  trace('converted',msg)
   if(msg.name == uniqueId) {
     //trace('message not for me: '+ msg_string + ' test: ' + (msg.target == uniqueId));
     return;

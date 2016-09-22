@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html style="height: 100%;"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -18,6 +18,11 @@
  <link href="/static/assets/myth.css" media="all" rel="stylesheet" type="text/css">
     <link href="/static/assets/separatedcs.css" media="all" rel="stylesheet" type="text/css">
  <style type="text/css">
+ 
+ .body {
+	 font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
+	 
+	 }
     @keyframes resizeanim { from { opacity: 0; } to { opacity: 0; } } .resize-triggers { animation: 1ms resizeanim; visibility: hidden; opacity: 0; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: " "; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }
     
     .clroom-presenter-signal2 {
@@ -52,6 +57,14 @@ h5 {
 	color: #FFF;
 }
 
+label {
+	
+ color: #00d372;
+    font-size: 13px;
+    margin: 10px;
+	
+	}
+
 .button {
     background-color: #4CAF50;
     border: none;
@@ -64,11 +77,17 @@ h5 {
     margin: 4px 2px;
     cursor: pointer;
 }
+
+video {
+	width:100%;
+	height:100%;
+	
+	}
     </style>
     
 </head>
 <body style="position: relative; min-height: 100%; top: 0px; margin-top: 0px;">
-<div class="window" data-title="Your Cam" data-width="220">
+<div class="window" id="test" data-title="Your Cam" data-width="220">
  <div id="main">
 
    <!--<section id="chatSection">
@@ -170,33 +189,18 @@ h5 {
         <li data-show-as="admin-presenter" style="">
           <div data-ng-controller="DemoController" data-ng-init="init(1)">
     <div class="well2">
-       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" data-ng-if="callStatus==true" data-ng-click="disconnectCall();" class="active" fill="#ed0000">
-		<g>
-			<path d="M17.5,4c5.872,0,8.5,4.269,8.5,8.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C27,7.771,24.062,3,17.5,3
-		C17.224,3,17,3.224,17,3.5S17.224,4,17.5,4z"/>
-			<path d="M17.5,9c2.893,0,3.5,1.903,3.5,3.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C22,9.64,20.359,8,17.5,8
-		C17.224,8,17,8.224,17,8.5S17.224,9,17.5,9z"/>
-			<path d="M25.25,19c-1.524,0-3.548-0.49-4.813-0.907c-0.606-0.21-1.357-0.019-1.727,0.365l-2.751,1.957
-		c-3.174-1.678-5.191-3.688-6.85-6.826l2.372-2.46c0.467-0.467,0.635-1.148,0.434-1.786C11.308,7.503,11,5.957,11,4.75
-		C11,3.785,10.215,3,9.25,3h-4.5C3.785,3,3,3.785,3,4.75C3,16.811,13.189,27,25.25,27c0.965,0,1.75-0.785,1.75-1.75v-4.5
-		C27,19.785,26.215,19,25.25,19z"/>
-		</g>
-      </svg> 
-      
- 
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"   data-ng-if="callStatus==false" data-ng-click="connectCall();" class="inactive" fill="#3ec732">
-		<g>
-			<path d="M17.5,4c5.872,0,8.5,4.269,8.5,8.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C27,7.771,24.062,3,17.5,3
-		C17.224,3,17,3.224,17,3.5S17.224,4,17.5,4z"/>
-			<path d="M17.5,9c2.893,0,3.5,1.903,3.5,3.5c0,0.276,0.224,0.5,0.5,0.5s0.5-0.224,0.5-0.5C22,9.64,20.359,8,17.5,8
-		C17.224,8,17,8.224,17,8.5S17.224,9,17.5,9z"/>
-			<path d="M25.25,19c-1.524,0-3.548-0.49-4.813-0.907c-0.606-0.21-1.357-0.019-1.727,0.365l-2.751,1.957
-		c-3.174-1.678-5.191-3.688-6.85-6.826l2.372-2.46c0.467-0.467,0.635-1.148,0.434-1.786C11.308,7.503,11,5.957,11,4.75
-		C11,3.785,10.215,3,9.25,3h-4.5C3.785,3,3,3.785,3,4.75C3,16.811,13.189,27,25.25,27c0.965,0,1.75-0.785,1.75-1.75v-4.5
-		C27,19.785,26.215,19,25.25,19z"/>
-		</g>
+       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 32.667 32.667" data-ng-if="callStatus==true" data-ng-click="disconnectCall();" class="active" fill="#fe0101">
+<g>
+	<path d="M16.333,0C7.327,0,0,7.327,0,16.334c0,9.006,7.326,16.333,16.333,16.333c0.557,0,1.007-0.451,1.007-1.006   c0-0.556-0.45-1.007-1.007-1.007c-7.896,0-14.318-6.424-14.318-14.319c0-7.896,6.422-14.32,14.318-14.32   c7.896,0,14.317,6.424,14.317,14.32c0,3.299-1.756,6.571-4.269,7.955c-0.913,0.502-1.903,0.751-2.959,0.761   c0.634-0.378,1.183-0.887,1.591-1.531c0.08-0.121,0.186-0.226,0.238-0.359c0.328-0.789,0.357-1.684,0.555-2.516   c0.243-1.066-4.658-3.143-5.084-1.815c-0.154,0.493-0.39,2.048-0.699,2.458c-0.275,0.365-0.953,0.193-1.377-0.168   c-1.117-0.952-2.364-2.352-3.458-3.457l0.002-0.001c-0.028-0.029-0.062-0.062-0.092-0.091c-0.031-0.03-0.062-0.062-0.093-0.092l0,0   c-1.106-1.093-2.506-2.338-3.457-3.458c-0.36-0.424-0.534-1.1-0.168-1.376c0.41-0.31,1.966-0.543,2.458-0.698   c1.326-0.425-0.75-5.329-1.816-5.084c-0.832,0.195-1.727,0.225-2.516,0.552c-0.134,0.056-0.238,0.16-0.359,0.24   c-2.799,1.775-3.16,6.083-0.428,9.292c1.041,1.228,2.127,2.416,3.245,3.576l-0.006,0.004c0.031,0.031,0.063,0.06,0.095,0.09   c0.03,0.031,0.059,0.062,0.088,0.095l0.006-0.006c1.16,1.118,2.535,2.764,4.769,4.255c4.703,3.141,8.312,2.264,10.438,1.098   c3.67-2.021,5.312-6.338,5.312-9.719C32.667,7.327,25.339,0,16.333,0z" fill="#D80027"/>
+
+</g>
 </svg>
-   
+
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32.666 32.666"   data-ng-if="callStatus==false" data-ng-click="connectCall();" class="inactive" fill="#1ad339">
+<g>
+	<path d="M28.189,16.504h-1.666c0-5.437-4.422-9.858-9.856-9.858l-0.001-1.664C23.021,4.979,28.189,10.149,28.189,16.504z    M16.666,7.856L16.665,9.52c3.853,0,6.983,3.133,6.981,6.983l1.666-0.001C25.312,11.735,21.436,7.856,16.666,7.856z M16.333,0   C7.326,0,0,7.326,0,16.334c0,9.006,7.326,16.332,16.333,16.332c0.557,0,1.007-0.45,1.007-1.006c0-0.559-0.45-1.01-1.007-1.01   c-7.896,0-14.318-6.424-14.318-14.316c0-7.896,6.422-14.319,14.318-14.319c7.896,0,14.317,6.424,14.317,14.319   c0,3.299-1.756,6.568-4.269,7.954c-0.913,0.502-1.903,0.751-2.959,0.761c0.634-0.377,1.183-0.887,1.591-1.529   c0.08-0.121,0.186-0.228,0.238-0.359c0.328-0.789,0.357-1.684,0.555-2.518c0.243-1.064-4.658-3.143-5.084-1.814   c-0.154,0.492-0.39,2.048-0.699,2.458c-0.275,0.366-0.953,0.192-1.377-0.168c-1.117-0.952-2.364-2.351-3.458-3.457l0.002-0.001   c-0.028-0.029-0.062-0.061-0.092-0.092c-0.031-0.029-0.062-0.062-0.093-0.092v0.002c-1.106-1.096-2.506-2.34-3.457-3.459   c-0.36-0.424-0.534-1.102-0.168-1.377c0.41-0.311,1.966-0.543,2.458-0.699c1.326-0.424-0.75-5.328-1.816-5.084   c-0.832,0.195-1.727,0.227-2.516,0.553c-0.134,0.057-0.238,0.16-0.359,0.24c-2.799,1.774-3.16,6.082-0.428,9.292   c1.041,1.228,2.127,2.416,3.245,3.576l-0.006,0.004c0.031,0.031,0.063,0.06,0.095,0.09c0.03,0.031,0.059,0.062,0.088,0.095   l0.006-0.006c1.16,1.118,2.535,2.765,4.769,4.255c4.703,3.141,8.312,2.264,10.438,1.098c3.67-2.021,5.312-6.338,5.312-9.719   C32.666,7.326,25.339,0,16.333,0z" fill="#09db41"/>
+</g>
+</svg>
 
 
   
@@ -584,185 +588,7 @@ h5 {
       <div id="management">
       </div>
     </div>
-    <div data-role="Organizer" style="" class="admin-box not-selectable Organizer onactive">
-  <div style="top:0;" class="clroom-mask"></div>
-  <!--admin header-->
-  <div class="admin-nav">
-    <div class="admin-icons">
-      <a href="javascript:void(0)" class="" id="admin-shrink">
-        <div class="admin-navicon"></div>
-      </a>
-    </div>
-    <div class="amdin-box-title">Chat Panel</div>
-  </div>
-  
-  <div style="top: 72px;" id="group-chat-outbox" class="clroom-chat-outbox">
-    <!--people chat nav-->
-    <div id="chat-tab" class="clroom-peoplechat-box-bg">
-      <ul id="chat-tab-wrapper" class="clroom-peoplechat-nav slick-initialized slick-slider">
-        <li><a href="#chat-message-wrapper" class="tab-name tab-name-group onactive" id="roomchat_group">Chat</a></li>
-        <!--wait to see if people-wrapper error keep happens
-          <li><a id="roomchat_people" class="tab-name tab-name-people" href="#people-wrapper">People&nbsp;</a></li>
-        -->
-        <li><a href="javascript:void(0)" class="tab-name tab-name-people" id="roomchat_people">People<span class="unread-count"><i id="peopleCount">1</i></span></a></li>
-       
-       
-      <div class="slick-list draggable" tabindex="0"><div class="slick-track" style="opacity: 1; width: 0px; transform: translate3d(0px, 0px, 0px);"></div></div></ul>
-    </div>
-    <!--people chat nav-->
-    <div class="clroom-groupchat-body onactive" id="roomchat_group_area" data-hashtag="#">
-  <div class="clroom-groupchat-out">
-    <!--<div class="top-prong">
-      <div class="prong-dk"></div>
-      <div class="prong-lt"></div>
-    </div>-->
-    
-  </div>
-</div>
-
-    
-    <div class="clroom-poll-out " id="roomchat_poll_area">
-  <!-- <div class="top-prong">
-    <div class="prong-dk"></div>
-    <div class="prong-lt"></div>
-  </div> -->
-  <div class="clroom-twitter-box">
-        
-      <div class="clroom-poll-chatbody">
-        <ul id="poll_result_area" class="clroom-groupchat">
-          
-        </ul>
-      </div>
-  </div>
-</div>
-    
-    <div data-hashtag="#" id="roomchat_group_area" class="clroom-groupchat-body onactive">
-  <div class="clroom-groupchat-out">
-    <!--<div class="top-prong">
-      <div class="prong-dk"></div>
-      <div class="prong-lt"></div>
-    </div>-->
-    <ul class="clroom-groupchat" id="chat-message">
-   </ul>
-  </div>
-</div>
-    
-    <!--input box-->
-    <div style="margin-top:374px; padding-left:80px;">
-    
-      </div>
-    
-    <div data-token-secret="" data-token="" id="chat_bottom" class="clroom-chat-inputbox onfocus">
    
-      <div id="chat_init" style="display: none;"></div>
-      <div id="chat_textarea" class="clroom-chat-inputbox-in">
-        <div class="clroom-chat-inputbox-border">
-          <div class="clroom-groupchat-right">
-            <div class="clroom-groupchat-right-in">
-              <div id="twitter_account_bottom" class="clroom-chat-tw-signin">Tweeting as <span>@</span> <a target="_blank" href="#">Switch accounts</a></div>
-            </div>
-          </div>
-        </div>
-        <div id="chat-input" class="clroom-chat-inputbox-border">
-          <div class="clroom-groupchat-img">
-            <a href="javascript:void(0)" onclick="triggerFileSelect();"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_192" x="0px" y="0px" viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve" width="20px" height="20px" class="active">
-<g>
-	<path d="M26.525,10.5l-4.712-6.582l-0.001-0.001L21.515,3.5H0v53h60v-46H26.525z M58,12.5v5H31.537l-3.579-5H58z M2,54.5v-49   h18.485l5,7h0.012l4.69,6.551c0.195,0.272,0.502,0.417,0.813,0.418V19.5h27v35H2z" fill="#FFFFFF"/>
-	<polygon points="21.293,32.793 22.707,34.207 29,27.914 29,45.5 31,45.5 31,27.914 37.293,34.207 38.707,32.793 30,24.086  " fill="#FFFFFF"/>
-</g>
-</svg></a>
-            
-          </div>
-          <div class="clroom-groupchat-right">
-            <div class="clroom-groupchat-right-in">
-              <div class="clroom-chat-inputbox-border-in">
-                <div class="left-prong">
-                  <div class="prong-dk"></div>
-                  <div class="prong-lt"></div>
-                </div>
-                <!-- <textarea id="roomchat_group_text" placeholder="Type your message here"></textarea> -->
-                <div id="chat_input_area">
-                  <div id="chat_input" contenteditable="true"><textarea id="chat_input_value" rows="4" cols="50"
-                  placeholder="Enter post here" autocomplete="off" onkeyup="handleKey(event)"
-                   disabled="disabled"> </textarea></div>
-                </div>
-              </div>
-              <ul class="clroom-chat-input-btu-box">
-                <li><a id="hands_up" href=""><span class=""></span></a></li>
-                <li><a id="select_face" href=""><span class=""></span></a></li>
-                <li><span id="room-at" class=""></span></li>
-                <li id="type_count"></li>
-                <li></li>
-                <li id="post_message_li">
-		
-                <button id="post_message" onclick="handleSendButton();" disabled="disabled">Send</button>	
-		<!-- a id="post_message" href="javascript:void(0);" onclick="handleSendButton();">Post</a --></li>
-                
-              </ul>
-              <input maxlength="1000" id="chat_input_value" type="hidden">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- /active send chat -->
-    <!-- disable send chat -->
-    <div style="display: none;" id="chat_bottom_disabled" class="clroom-chat-inputbox">
-      <div class="clroom-chat-inputbox-in-disabled">
-        <div class="clroom-chat-input-mask"></div>
-        <div class="clroom-chat-inputbox-border">
-          <div class="clroom-groupchat-img">
-            <a href="javascript:void(0)"><img title="" src="assets/4.png" class="" alt=""></a>
-          </div>
-          <div class="clroom-groupchat-right">
-            <div class="clroom-groupchat-right-in">
-              <div class="clroom-chat-inputbox-border-in">
-                <div class="left-prong">
-                  <div class="prong-dk"></div>
-                  <div class="prong-lt"></div>
-                </div>
-                <div class="clroom-chat-attendee-disabled">Attendee chat disabled</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- /disable send chat -->
-    <!--input box-->
-
-
-    <div style="display:none;" id="qanda_bottom_alert" class="clroom-chat-msgbox">
-      <span></span>
-      <span id="qanda_bottom_alert_close">
-        <svg viewbox="0 0 512 512" height="512" width="512" version="1.1" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-          <path d="M507.331 411.33c-0.002-0.002-0.004-0.004-0.006-0.005l-155.322-155.325 155.322-155.325c0.002-0.002 0.004-0.003 0.006-0.005 1.672-1.673 2.881-3.627 3.656-5.708 2.123-5.688 0.912-12.341-3.662-16.915l-73.373-73.373c-4.574-4.573-11.225-5.783-16.914-3.66-2.080 0.775-4.035 1.984-5.709 3.655 0 0.002-0.002 0.003-0.004 0.005l-155.324 155.326-155.324-155.325c-0.002-0.002-0.003-0.003-0.005-0.005-1.673-1.671-3.627-2.88-5.707-3.655-5.69-2.124-12.341-0.913-16.915 3.66l-73.374 73.374c-4.574 4.574-5.784 11.226-3.661 16.914 0.776 2.080 1.985 4.036 3.656 5.708 0.002 0.001 0.003 0.003 0.005 0.005l155.325 155.324-155.325 155.326c-0.001 0.002-0.003 0.003-0.004 0.005-1.671 1.673-2.88 3.627-3.657 5.707-2.124 5.688-0.913 12.341 3.661 16.915l73.374 73.373c4.575 4.574 11.226 5.784 16.915 3.661 2.080-0.776 4.035-1.985 5.708-3.656 0.001-0.002 0.003-0.003 0.005-0.005l155.324-155.325 155.324 155.325c0.002 0.001 0.004 0.003 0.006 0.004 1.674 1.672 3.627 2.881 5.707 3.657 5.689 2.123 12.342 0.913 16.914-3.661l73.373-73.374c4.574-4.574 5.785-11.227 3.662-16.915-0.776-2.080-1.985-4.034-3.657-5.707z"></path>
-        </svg>
-      </span>
-    </div>
-    <div style="display:none;" id="qanda_bottom" class="clroom-chat-inputbox onfocus">
-      <div id="qanda_textarea" class="clroom-chat-inputbox-in">
-        <div id="qanda-input" class="clroom-chat-inputbox-border">
-          <div class="clroom-groupchat-right">
-            <div class="clroom-chat-inputbox-border-in">
-              <textarea placeholder="Ask a question..." id="qanda_text"></textarea>
-            </div>
-            <ul class="clroom-chat-input-btu-box">
-              <li></li>
-              <li></li>
-              <li></li>
-              <li></li>
-              <li></li>
-              <li><a id="post_qanda" href="javascript:void(0);">Ask Question</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  
-  </div>
-  
-</div>
 
 
 
@@ -783,4 +609,12 @@ h5 {
   <script type="text/javascript"> 
         connect('{{ ice_uri }}');
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $("#test").parent().css({ "color": "red", "height": "200px", "width": "250px", "left": "580px", "top": "315px" });
+            $("#test").css("height", 173);
+        });
+    </script>
+
 </body></html>

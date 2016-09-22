@@ -15,7 +15,6 @@ from utils.helpers import get_client_ip
 from utils.logger import glogger
 from utils.helpers import login_required
 
-
 # Create your views here.
 def join_meeting(request, room_id):
     try:
@@ -70,10 +69,16 @@ def notify(request, user, ws_id):
     :param ws_id:
     :return:
     '''
+    data=ws_id
     request_data = request.POST if request.method == 'POST' else request.GET
+    information=request_data['info']
+    print "data----",data
+    glogger.debug("data of notify: ",data)
+    #callerId=data.values()[1]
+    #meetingURL=data.values()[2]	
     notification_string = json.dumps(request_data)
     if attendance_register.hexists(ONLINE, ws_id):
-        Channel(ws_id).send({'text': notification_string})
+        Channel(ws_id).send({'text':information})
         return HttpResponse(notification_string)
     else:
         return HttpResponseNotFound(settings.WS_OFFLINE_NOTICE)
