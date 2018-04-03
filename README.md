@@ -63,7 +63,7 @@ Webrtc meetings also supports server side push once you know the channel_name of
 
 This feature is only available to websockets connected to the /attendance/ url
 
-For example, give below two websockets:
+For example, given below two websockets:
 
     from websocket import create_connection
 
