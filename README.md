@@ -9,7 +9,7 @@ the respective URL can be shared with all the participants who are interested in
 The multi-participants webrtc call is only possible so far the room ID is valid.
 
 
-##Installation
+## Installation
 
 
 1. install dependencies by running:
@@ -30,7 +30,7 @@ The multi-participants webrtc call is only possible so far the room ID is valid.
 
 
 
-##Getting Started.
+## Getting Started.
 
 1. Create a room by invoking the sample URL:
 
