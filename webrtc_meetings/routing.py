@@ -5,6 +5,7 @@ from channels.routing import route
 from channels import Channel, Group
 #I dont think channel session is needed for now
 from channels.sessions import channel_session
+from channels.auth import channel_session_user, channel_session_user_from_http
 from django.core.urlresolvers import get_resolver
 from django.db.models import Q
 from django.conf import settings
@@ -26,7 +27,8 @@ def ws_add(message):
     room_id = message['path'].strip('/').split('/')[-1]
     wlogger.debug('adding %s'% room_id)
     meeting = Meeting.get_meeting(room_id) #allow ex
-    Group(settings.ROOM_KEY_FORMAT % {'room_id' : room_id}).add(message.reply_channel)
+    Group(settings.ROOM_KEY_FORMAT % {'room_id': room_id}
+          ).add(message.reply_channel)
     message.channel_session['room'] = room_id
     wlogger.debug('message from: %s, room: %s' % (message, room_id))
     message.reply_channel.send({'accept': True})
@@ -53,12 +55,14 @@ ONLINE = 'online'
 store = redis.Redis(db=int(settings.CACHEOPS_REDIS['db'])+1)
 
 
+@channel_session_user_from_http
 def mark_present(message):
     ip, port = message['client']
     wlogger.info('msg ip: %s, port: %s' % (ip, port))
     a = Attendant(ip=ip, port=port, channel_name=message.reply_channel.name,
+                  user=message.user.username,
                   details=get_request_params(message['query_string']))
-    store.hset(ONLINE, message.reply_channel.name, Attendant.dumps(a))
+    store.hset(ONLINE, message.reply_channel.name, a.dumps())
     message.reply_channel.send({'accept': True})
 
 

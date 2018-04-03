@@ -8,6 +8,8 @@ The application works on the concept of "meetings rooms". Once a meeting room is
 the respective URL can be shared with all the participants who are interested in joining the call.
 The multi-participants webrtc call is only possible so far the room ID is valid.
 
+Solution also implements some server side push mechanism.
+
 
 ## Installation
 
@@ -55,6 +57,46 @@ The multi-participants webrtc call is only possible so far the room ID is valid.
     http://127.0.0.1/meeting/2.317f6509-902d-47e9-967f-93880b77d6bc/
 
 
+## Server Side Push support:
+
+Webrtc meetings also supports server side push once you know the channel_name of the peer.
+
+This feature is only available to websockets connected to the /attendance/ url
+
+For example, give below two websockets:
+
+    from websocket import create_connection
+
+    ws = create_connection('ws://127.0.0.1:8007/attendance/?my_id=bob')
+
+    ws2 = create_connection('ws://127.0.0.1:8007/attendance/?my_id=peter')
+
+
+    To get the list of all onsite websockets, following request should be made:
+
+    GET http://127.0.0.1:8007/online_attendants/
+
+    Response looks like this:
+
+    [{"port": 56786, "channel_name": "daphne.response.UgPuzlDeBz!cgRJARZxNI",
+    "ip": "127.0.0.1", "user": "", "details": {"my_id": "peter"}}, {"port": 56768,
+    "channel_name": "daphne.response.UgPuzlDeBz!rjJBEjKGmT",
+    "ip": "127.0.0.1", "user": "", "details": {"my_id": "bob"}}]
+
+    Basically, anything supplied as query parameter to the websocket URL is made available under details when
+    GET http://127.0.0.1:8007/online_attendants/ is invoked (in this case ?my_id=peter and ?my_id=bob).
+
+
+To push message specifically to "peter", you do that by calling
+
+
+    GET http://127.0.0.1:8007/notify_ws/daphne.response.UgPuzlDeBz!cgRJARZxNI/?info=hey%20man
+
+With this, ws.recv() receives the messay "hey man"
+
+
+
+
 
 ## To do
 
@@ -63,3 +105,5 @@ The multi-participants webrtc call is only possible so far the room ID is valid.
 2. chat and File sharing is implemented in js files. Need to make visible on UI.
 
 3. Video and voice recording is not working properly yet. Would check when I get the time.
+
+4. Handle server push (discovery and identification) more smoothly.

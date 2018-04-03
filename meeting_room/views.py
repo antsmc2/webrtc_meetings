@@ -85,7 +85,6 @@ def notify(request, user, ws_id):
     data=ws_id
     request_data = request.POST if request.method == 'POST' else request.GET
     information=request_data['info']
-    print "data----",data
     glogger.debug("data of notify: ",data)
     #callerId=data.values()[1]
     #meetingURL=data.values()[2]	
