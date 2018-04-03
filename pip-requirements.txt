@@ -15,5 +15,5 @@ django-cacheops
 django-passwords
 django-timezone-field
 daphne<2
-
+django-cors-headers
 

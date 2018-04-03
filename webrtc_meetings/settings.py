@@ -108,15 +108,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 #STATIC_ROOT = ''
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# STATIC_DIR = (
-#     ('static', os.path.join(BASE_DIR, 'static')),
-# )
-
-STATICFILES_DIRS = [
-    
-]
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)
 
 CHANNEL_LAYERS = {
     "default": {
@@ -141,9 +136,12 @@ WEBSOCKET_BASE_URL = '/meetings/'
 
 CACHE_REFRESH_DURATION = 10800
 CACHEOPS = {
-    'meeting_room.meeting': {'ops': 'all' , 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'service_access.*': {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
-    'auth.user' : {'ops': 'all', 'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'meeting_room.meeting': {'ops': 'all',  #refresh every 3 hrs
+                             'timeout': CACHE_REFRESH_DURATION},
+    'service_access.*': {'ops': 'all',
+                         'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
+    'auth.user': {'ops': 'all',
+                   'timeout': CACHE_REFRESH_DURATION},  #refresh every 3 hrs
 }
 
 RQ_QUEUES = {
@@ -160,24 +158,16 @@ WS_OFFLINE_NOTICE = 'OFFLINE'
 
 ROOM_KEY_FORMAT = 'room-%(room_id)s'
 
-ICE_SERVERS = [
+ICE_SERVERS = [         # pls update with your ice credentials
   {
     'urls': 'stun:stun.l.google.com:19302',
   },
   {
-	'urls':'stun:202.153.34.169:8002?transport=tcp',
+    'urls': 'stun:202.153.34.169:8002?transport=tcp',
   },
   {
-	'urls':'stun:global.stun.twilio.com:3478?transport=udp',
-  },
-  {
-    'urls' : 'turn:202.153.34.169:8002?transport=tcp',
+    'urls': 'turn:202.153.34.169:8002?transport=udp',
     'credential': 'dhanush123',
     'username': 'dhanush'
   },
-  {
-    'urls': 'turn:global.turn.twilio.com:3478?transport=udp',
-    'credential': 'lN48+q3dzIvVFTIojLICy53W0lo9vujIoBcLExzS6pI=',
-    'username': '70cfe39ec1b0922d41f49812f110383f31c7d0e861b27e40d58e5a1b453f4c01'
-  }
 ];

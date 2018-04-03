@@ -22,7 +22,8 @@ def get_group(message):
 
 @channel_session
 def ws_add(message):
-    room_id = message['path'].strip('/').split('/')[-1] #to fix later. This implicitly assumes fix ws_url pattern
+    # to fix later. This implicitly assumes fix ws_url pattern
+    room_id = message['path'].strip('/').split('/')[-1]
     wlogger.debug('adding %s'% room_id)
     meeting = Meeting.get_meeting(room_id) #allow ex
     Group(settings.ROOM_KEY_FORMAT % {'room_id' : room_id}).add(message.reply_channel)
@@ -35,14 +36,16 @@ def ws_add(message):
 def ws_message(message):
     group = get_group(message)
     message_text = message['text']
-    wlogger.debug('%s-%s: broadcasting: %s' % (message.reply_channel.name, group.name, message_text))
+    wlogger.debug('%s-%s: broadcasting: %s' % (message.reply_channel.name,
+                                               group.name, message_text))
     group.send({'text': message_text})
 
 
 @channel_session
 def ws_disconnect(message):
     group = get_group(message)
-    wlogger.debug('disconnecting %s-%s' % (message.reply_channel.name, group.name))
+    wlogger.debug('disconnecting %s-%s' % (message.reply_channel.name,
+                                           group.name))
     group.discard(message.reply_channel)
 
 

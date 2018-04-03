@@ -1,6 +1,7 @@
 import json
 from channels import Channel
-from django.shortcuts import render, get_object_or_404, render_to_response, RequestContext
+from django.shortcuts import (render, get_object_or_404, render_to_response,
+                              RequestContext)
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.http import HttpResponse, HttpResponseNotFound
@@ -15,14 +16,17 @@ from utils.helpers import get_client_ip
 from utils.logger import glogger
 from utils.helpers import login_required
 
+
 # Create your views here.
 def join_meeting(request, room_id):
     try:
         meeting = Meeting.get_meeting(room_id)
     except Meeting.DoesNotExist:
         return HttpResponseNotFound()
-    return render_to_response('meeting_room/meeting.html', {'ice_uri': reverse('get_ice', kwargs={'room_id': room_id}),
-                                                            'meeting': meeting},
+    return render_to_response('meeting_room/meeting.html',
+                              {'ice_uri': reverse('get_ice',
+                                                  kwargs={'room_id': room_id}),
+                               'meeting': meeting},
                               context_instance=RequestContext(request))
 
 
@@ -31,7 +35,8 @@ def get_ice(request, room_id):
         meeting = Meeting.get_meeting(room_id)
     except Meeting.DoesNotExist:
         return HttpResponseNotFound()
-    return HttpResponse(json.dumps(settings.ICE_SERVERS), content_type='application/json')
+    return HttpResponse(json.dumps(settings.ICE_SERVERS),
+                        content_type='application/json')
 
 
 def online_attendants(request):
@@ -48,16 +53,24 @@ def create_room(request, user):
         duration = int(request_data['duration'])
         timezone_requested = request_data.get('timezone', settings.TIME_ZONE)
         description = request_data.get('description', '')
-        meeting = Meeting.objects.create(creator=user, timezone=timezone_requested, activation_date=timezone.now(),
-                                         duration=duration, description=description)
+        meeting = Meeting.objects.create(creator=user,
+                                         timezone=timezone_requested,
+                                         activation_date=timezone.now(),
+                                         duration=duration,
+                                         description=description)
         meeting_url = meeting.meeting_url()     # to generate the meeting url
-        return HttpResponse(json.dumps({'creator': user.username, 'start_date': meeting.activation_date,
-                                        'duration': meeting.duration, 'meeting_url': meeting_url,
+        timezone.activate(meeting.timezone)
+        local_time = timezone.localtime(meeting.activation_date)
+        return HttpResponse(json.dumps({'creator': user.username,
+                                        'start_date': local_time,
+                                        'duration': meeting.duration,
+                                        'meeting_url': meeting_url,
                                         'description': meeting.description},
                                        cls=DjangoJSONEncoder),)
     except Exception, ex:
         raise ex
-    return HttpResponseNotFound()   # generally give page not found for other failures
+    # generally give page not found for other failures
+    return HttpResponseNotFound()
 
 
 @login_required
@@ -78,7 +91,7 @@ def notify(request, user, ws_id):
     #meetingURL=data.values()[2]	
     notification_string = json.dumps(request_data)
     if attendance_register.hexists(ONLINE, ws_id):
-        Channel(ws_id).send({'text':information})
+        Channel(ws_id).send({'text': information})
         return HttpResponse(notification_string)
     else:
         return HttpResponseNotFound(settings.WS_OFFLINE_NOTICE)

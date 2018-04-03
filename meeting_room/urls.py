@@ -1,6 +1,7 @@
 __author__ = 'anthony <>'
 from django.conf.urls import include, url
-from meeting_room.views import get_ice, join_meeting, online_attendants, create_room, notify
+from meeting_room.views import (get_ice, join_meeting, online_attendants,
+                                create_room, notify)
 
 #app_name = 'meeting_room'
 
