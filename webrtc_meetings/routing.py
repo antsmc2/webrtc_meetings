@@ -28,6 +28,7 @@ def ws_add(message):
     Group(settings.ROOM_KEY_FORMAT % {'room_id' : room_id}).add(message.reply_channel)
     message.channel_session['room'] = room_id
     wlogger.debug('message from: %s, room: %s' % (message, room_id))
+    message.reply_channel.send({'accept': True})
 
 
 @channel_session
@@ -55,6 +56,7 @@ def mark_present(message):
     a = Attendant(ip=ip, port=port, channel_name=message.reply_channel.name,
                   details=get_request_params(message['query_string']))
     store.hset(ONLINE, message.reply_channel.name, Attendant.dumps(a))
+    message.reply_channel.send({'accept': True})
 
 
 def broadcast_message(message):
