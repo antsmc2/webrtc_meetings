@@ -57,7 +57,7 @@ Solution also implements some server side push mechanism.
     http://127.0.0.1/meeting/2.317f6509-902d-47e9-967f-93880b77d6bc/
 
 
-## Server Side Push support:
+## Server Sent Events support:
 
 Webrtc meetings also supports server side push once you know the channel_name of the peer.
 
