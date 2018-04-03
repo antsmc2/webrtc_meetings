@@ -92,7 +92,7 @@ To push message specifically to "peter", you do that by calling
 
     GET http://127.0.0.1:8007/notify_ws/daphne.response.UgPuzlDeBz!cgRJARZxNI/?info=hey%20man
 
-With this, ws.recv() receives the messay "hey man"
+With this, ws.recv() receives the message "hey man"
 
 
 
