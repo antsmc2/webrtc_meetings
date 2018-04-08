@@ -95,15 +95,17 @@ To push message specifically to "peter", you do that by calling
 With this, ws.recv() receives the message "hey man"
 
 
+## What next?
 
+You need to setup your Stun and Turn servers and configure the credentials in webrtc_meetins/settings.py (Tested this with coTurn and reTurn.)
 
 
 ## To do
 
-1. Test cases
+1. Myself and friends has used this in some of their webrtc projects. But I still need to add automated Test cases
 
-2. chat and File sharing is implemented in js files. Need to make visible on UI.
+2. chat and File sharing is implemented in js files. Need to make visible on UI (I had done this and tested on a previous machine but can't seem to find it :(. I'll reimplement when I have some time).
 
-3. Video and voice recording is not working properly yet. Would check when I get the time.
+3. Recording (voice and video recording) is not working properly yet. Would check when I get the time.
 
-4. Handle server push (discovery and identification) more smoothly.
+4. Handle server sent events (server push) discovery and identification more smoothly.
