@@ -852,7 +852,9 @@ function toggleCall() {
 
 function stopCall() {
     if(localStream && localStream.getTracks()) {
-        localStream.getTracks()[0].stop();
+        localStream.getTracks().forEach(function(track) {
+        	track.stop();
+        });
         localStream = null;
         localVideo.src = null;
         localVideo.srcObject = null;

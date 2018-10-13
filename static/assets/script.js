@@ -52,8 +52,8 @@ angular.module('switchdemo', []).controller('DemoController', function($scope){
   }
 
   $scope.disconnectCall = function() {
-      stopCall();
       $scope.callStatus = false;
+      stopCall();
   }
 
   $scope.connectCall = function() {
