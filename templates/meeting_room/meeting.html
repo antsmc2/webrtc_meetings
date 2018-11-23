@@ -1,117 +1,101 @@
 ﻿{% load static %}
-<!DOCTYPE html>
-<html style="height: 100%;"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>{{meeting.description}}</title>
-   <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-   
-    <link rel="stylesheet" href="{% static "css/base.css" %}" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!--[if lte IE 7]>
-  <script src="javascript/lte-ie7.js"></script><![endif]-->
-   
-   <link data-require="bootstrap@*" data-semver="3.2.0" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css" />
-    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />  
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-  <script data-require="jquery@*" data-semver="2.1.1" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <link rel="stylesheet" href="/static/assets/style.css" />
-  <script src="/static/assets/script.js"></script>
- <link href="/static/assets/myth.css" media="all" rel="stylesheet" type="text/css">
-    <link href="/static/assets/separatedcs.css" media="all" rel="stylesheet" type="text/css">
- <style type="text/css">
- 
- .body {
-	 font-family:"Trebuchet MS", Arial, Helvetica, sans-serif;
-	 
-	 }
-    @keyframes resizeanim { from { opacity: 0; } to { opacity: 0; } } .resize-triggers { animation: 1ms resizeanim; visibility: hidden; opacity: 0; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: " "; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }
-    
-    .clroom-presenter-signal2 {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    height: 38px;
-    left: 463px;
-	}
-	
-	 .clroom-presenter-signal3 {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    height: 38px;
-    left: 419px;
-	}
-	
-	.hangup {
-    background: #0681ff none repeat scroll 0 0;
-    box-sizing: border-box;
-    display: block;
-    height: 38px;
-    padding: 9px 0 0;
-    width: 38px;
-}
-    h1,h2,h3,h4,h5,h6 {
-	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-}
-h5 {
-	font-size: 12%;
-	color: #FFF;
-}
 
-label {
-	
- color: #00d372;
-    font-size: 13px;
-    margin: 10px;
-	
-	}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="{{meeting.description}}">
 
-.button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
+    <title>{{meeting.description}}</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  </head>
 
-video {
-	width:100%;
-	height:100%;
-	
-	}
-    </style>
-    
-</head>
-<body style="position: relative; min-height: 100%; top: 0px; margin-top: 0px;">
-<div class="window" id="test" data-title="Your Cam" data-width="220">
- <div id="main">
-
-   <!--<section id="chatSection">
-        <div id="chatPane"><p id="welcome">Connecting...</p></div>
-        <div id="chatControls">
-            <div class="flexChild" id="chat-controls-container">
-                Chat: <input id="text" type="text" name="text" size="80" maxlength="256"
-                  placeholder="Enter post here" autocomplete="off" onkeyup="handleKey(event)"
-                   disabled="disabled"/>
-                <button id="send" onclick="handleSendButton();" disabled="disabled">Send</button>
-              </div>
+  <body>	        
+    <main role="main">
+	  
+      <section class="text-center">
+        <div class="container">
+          <div class="btn-group" role="group">
+             <button type="button" id="toggleCall" class="btn btn-sm btn-outline-secondary">Disconnect</button>
+             <button type="button" id="muteAudio" class="btn btn-sm btn-outline-secondary" disabled="disabled">Mute Audio</button>
+             <button type="button" id="muteVideo" class="btn btn-sm btn-outline-secondary" disabled="disabled">Mute Video</button>
+             <button id="recordButton" class="btn btn-sm btn-outline-secondary">Start Recording</button>
+	          <button id="downloadRecordButton" disabled="disabled" class="btn btn-sm btn-outline-secondary">Download</button>
+           </div>
+           <div class="btn-group" role="group">
+             <button type="button" class="btn btn-sm gear">Settings</button>
+             <div class="dropdown-menu" aria-labelledby="settingDropDown">
+			      <section id="personalization">
+				        <div>
+				            <h2>Set Name</h2>
+				            <input id="myName" type="text" />
+				            <button class="cusbut" id="setName" onclick="saveMyName();">save</button><span id="myNameStatus"></span>
+				        </div>
+				    </section>
+				    <section  id="constraints">
+				            <div id="getUserMedia">
+				            <div class="input">
+				              <h2>Camera settings</h2>
+				              <br />
+				              <div id="minWidth">
+				                <label>Min width <span>640</span>px:</label>
+				                <input type="range" min="0" max="1920" value="640">
+				              </div>
+				              <div id="maxWidth">
+				                <label>Max width <span>1920</span>px:</label>
+				                <input type="range" min="0" max="1920" value="1920">
+				              </div>
+				              <div id="minHeight">
+				                <label>Min height <span>480</span>px:</label>
+				                <input type="range" min="0" max="1080" value="480">
+				              </div>
+				              <div id="maxHeight">
+				                <label>Max height <span>1080</span>px:</label>
+				                <input type="range" min="0" max="1080" value="1080">
+				              </div>
+				              <div id="framerate">
+				                <label>Max Frame rate <span>20</span>fps:</label>
+				                <input type="range" min="5" max="50" value="20">
+				              </div>
+				            </div>
+				            <div id="getUserMediaConstraints" class="output"></div>
+				          </div>
+				    </section>
+		    </div>
+           </div>
         </div>
-    </section>-->
-    <section id="avSection">
-        <div id="webtrc">
-           <div id="all-video">
-                <div id="myVideoContainer"></div>
-                <div id="videoContainer" class="video">
-                </div>
-                <div id="chat-container" class="chat">
+      </section>
 
-                </div>
+      <div class="album py-5 bg-light">
+        <div class="container-fluid">
+
+          <div class="row">
+            <div class="col-md-1">
+             	<div class="embed-responsive embed-responsive-16by9" id="myVideoContainer">
+		              
+		        </div> 
             </div>
-            <div id="file-share" class="file-share" style="display: none;">
+            <div class="col-md-11">
+            	<div class="container-fluid">
+            		<div class="row no-gutters" id="video-list">
+            		
+            		</div>
+            	</div>
+            </div>
+          </div>  
+        </div>
+      </div>
+
+    </main>
+	
+    <footer class="text-muted">
+      <div class="container">
+         <div style="display: none;">
+             	<div id="chat-container" class="chat">
+
+               </div>
+             	<div id="file-share" class="file-share" style="display: none;">
                 <form id="fileInfo">
                     <input type="file" id="fileInput" name="files" disabled="disabled"/>
                 </form>
@@ -133,488 +117,28 @@ video {
                       <button id="muteAudio"  disabled="disabled">Mute Audio</button>
                       <button id="muteVideo"  disabled="disabled">Mute Video</button>
                   </div>
-                  <div id="recordings">
-                      <div>
-                          <button id="recordButton">Start Recording</button>
-                          <button id="downloadRecordButton" disabled="disabled">Download</button>
-                      </div>
-                  </div>
+                  
                   <div id="restart">
                       <button id="toggleCall" disabled="disabled">Disconnect</button>
                   </div>
-
-            </div>
-        </div>
-        
- <!-- video controls="controls" 
-       class="video-stream" 
-       x-webkit-airplay="allow" 
-       data-youtube-id="N9oxmRT2YWw" 
-       src="https://youtu.be/EQIefCVeOU8" width="100%" height="100%"></video -->
-        
-        </section>
-
-    </div>
- </div>
-    <div id="room-body" data-ng-app="switchdemo">
-  <a href="javascript:void(0);" >
-
-   
-  <div style="top: 0px;" class="clroom-main">
-
-    <!--main nav-->
- 
-    <!-- new room top -->
-    <div style="background-color: #1b2229; border-bottom: 1px solid rgb(223, 225, 228);" class="clroom-header">
-      <!--mask-->
-      <div class="clroom-mask" style="top:0; display:none;"></div>
-      <!--newroom logo--> </a>
-          <div class="clroom-start-trial-no-background">
-          </div>
-      <ul class="clroom-nav">
-        
-         <li data-show-as="admin-presenter" style="">
-          <div data-ng-controller="DemoController" data-ng-init="init(5)">
-    <div class="well2">
-    
-  
-<h1></h1>
-
-
-    </div>
-   
-     </div>
-     </li>
-        
-        <li data-show-as="admin-presenter" style="">
-          <div data-ng-controller="DemoController" data-ng-init="init(1)">
-    <div class="well2">
-       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 32.667 32.667" data-ng-if="callStatus==true" data-ng-click="disconnectCall();" class="active" fill="#fe0101">
-<g>
-	<path d="M16.333,0C7.327,0,0,7.327,0,16.334c0,9.006,7.326,16.333,16.333,16.333c0.557,0,1.007-0.451,1.007-1.006   c0-0.556-0.45-1.007-1.007-1.007c-7.896,0-14.318-6.424-14.318-14.319c0-7.896,6.422-14.32,14.318-14.32   c7.896,0,14.317,6.424,14.317,14.32c0,3.299-1.756,6.571-4.269,7.955c-0.913,0.502-1.903,0.751-2.959,0.761   c0.634-0.378,1.183-0.887,1.591-1.531c0.08-0.121,0.186-0.226,0.238-0.359c0.328-0.789,0.357-1.684,0.555-2.516   c0.243-1.066-4.658-3.143-5.084-1.815c-0.154,0.493-0.39,2.048-0.699,2.458c-0.275,0.365-0.953,0.193-1.377-0.168   c-1.117-0.952-2.364-2.352-3.458-3.457l0.002-0.001c-0.028-0.029-0.062-0.062-0.092-0.091c-0.031-0.03-0.062-0.062-0.093-0.092l0,0   c-1.106-1.093-2.506-2.338-3.457-3.458c-0.36-0.424-0.534-1.1-0.168-1.376c0.41-0.31,1.966-0.543,2.458-0.698   c1.326-0.425-0.75-5.329-1.816-5.084c-0.832,0.195-1.727,0.225-2.516,0.552c-0.134,0.056-0.238,0.16-0.359,0.24   c-2.799,1.775-3.16,6.083-0.428,9.292c1.041,1.228,2.127,2.416,3.245,3.576l-0.006,0.004c0.031,0.031,0.063,0.06,0.095,0.09   c0.03,0.031,0.059,0.062,0.088,0.095l0.006-0.006c1.16,1.118,2.535,2.764,4.769,4.255c4.703,3.141,8.312,2.264,10.438,1.098   c3.67-2.021,5.312-6.338,5.312-9.719C32.667,7.327,25.339,0,16.333,0z" fill="#D80027"/>
-
-</g>
-</svg>
-
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 32.666 32.666"   data-ng-if="callStatus==false" data-ng-click="connectCall();" class="inactive" fill="#1ad339">
-<g>
-	<path d="M28.189,16.504h-1.666c0-5.437-4.422-9.858-9.856-9.858l-0.001-1.664C23.021,4.979,28.189,10.149,28.189,16.504z    M16.666,7.856L16.665,9.52c3.853,0,6.983,3.133,6.981,6.983l1.666-0.001C25.312,11.735,21.436,7.856,16.666,7.856z M16.333,0   C7.326,0,0,7.326,0,16.334c0,9.006,7.326,16.332,16.333,16.332c0.557,0,1.007-0.45,1.007-1.006c0-0.559-0.45-1.01-1.007-1.01   c-7.896,0-14.318-6.424-14.318-14.316c0-7.896,6.422-14.319,14.318-14.319c7.896,0,14.317,6.424,14.317,14.319   c0,3.299-1.756,6.568-4.269,7.954c-0.913,0.502-1.903,0.751-2.959,0.761c0.634-0.377,1.183-0.887,1.591-1.529   c0.08-0.121,0.186-0.228,0.238-0.359c0.328-0.789,0.357-1.684,0.555-2.518c0.243-1.064-4.658-3.143-5.084-1.814   c-0.154,0.492-0.39,2.048-0.699,2.458c-0.275,0.366-0.953,0.192-1.377-0.168c-1.117-0.952-2.364-2.351-3.458-3.457l0.002-0.001   c-0.028-0.029-0.062-0.061-0.092-0.092c-0.031-0.029-0.062-0.062-0.093-0.092v0.002c-1.106-1.096-2.506-2.34-3.457-3.459   c-0.36-0.424-0.534-1.102-0.168-1.377c0.41-0.311,1.966-0.543,2.458-0.699c1.326-0.424-0.75-5.328-1.816-5.084   c-0.832,0.195-1.727,0.227-2.516,0.553c-0.134,0.057-0.238,0.16-0.359,0.24c-2.799,1.774-3.16,6.082-0.428,9.292   c1.041,1.228,2.127,2.416,3.245,3.576l-0.006,0.004c0.031,0.031,0.063,0.06,0.095,0.09c0.03,0.031,0.059,0.062,0.088,0.095   l0.006-0.006c1.16,1.118,2.535,2.765,4.769,4.255c4.703,3.141,8.312,2.264,10.438,1.098c3.67-2.021,5.312-6.338,5.312-9.719   C32.666,7.326,25.339,0,16.333,0z" fill="#09db41"/>
-</g>
-</svg>
-
-
-  
-<h1></h1>
-
-
-    </div>
-   
-     </div>
-     </li>
-        <li data-show-as="admin-presenter" style="">
-          <div data-ng-controller="DemoController" data-ng-init="init(1)">
-    <div class="well2">
-       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24" data-ng-if="muteVideoStatus==true" data-ng-click="muteVideo();" class="active" fill="#3ec732"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg> 
-      
- 
- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"   data-ng-if="muteVideoStatus==false" data-ng-click="unMuteVideo();" class="inactive" fill="#ed0000">
- <path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z"/></svg>
-   
-
-
-  
-<h1></h1>
-
-
-    </div>
-   
-     </div>
-     </li>
-    
-        <li data-show-as="admin-presenter" style="">
-        <div data-ng-controller="DemoController" data-ng-init="init(2)">
-    <div class="well2">
-     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_4" x="0px" y="0px" viewbox="0 0 475.085 475.085" style="enable-background:new 0 0 475.085 475.085;" xml:space="preserve" data-ng-if="muteAudioStatus==true" data-ng-click="muteAudio();" class="active">
-
-		<path d="M237.541,328.897c25.128,0,46.632-8.946,64.523-26.83c17.888-17.884,26.833-39.399,26.833-64.525V91.365    c0-25.126-8.938-46.632-26.833-64.525C284.173,8.951,262.669,0,237.541,0c-25.125,0-46.632,8.951-64.524,26.84    c-17.893,17.89-26.838,39.399-26.838,64.525v146.177c0,25.125,8.949,46.641,26.838,64.525    C190.906,319.951,212.416,328.897,237.541,328.897z" fill="#08ef08"/>
-		<path d="M396.563,188.15c-3.606-3.617-7.898-5.426-12.847-5.426c-4.944,0-9.226,1.809-12.847,5.426    c-3.613,3.616-5.421,7.898-5.421,12.845v36.547c0,35.214-12.518,65.333-37.548,90.362c-25.022,25.03-55.145,37.545-90.36,37.545    c-35.214,0-65.334-12.515-90.365-37.545c-25.028-25.022-37.541-55.147-37.541-90.362v-36.547c0-4.947-1.809-9.229-5.424-12.845    c-3.617-3.617-7.895-5.426-12.847-5.426c-4.952,0-9.235,1.809-12.85,5.426c-3.618,3.616-5.426,7.898-5.426,12.845v36.547    c0,42.065,14.04,78.659,42.112,109.776c28.073,31.118,62.762,48.961,104.068,53.526v37.691h-73.089    c-4.949,0-9.231,1.811-12.847,5.428c-3.617,3.614-5.426,7.898-5.426,12.847c0,4.941,1.809,9.233,5.426,12.847    c3.616,3.614,7.898,5.428,12.847,5.428h182.719c4.948,0,9.236-1.813,12.847-5.428c3.621-3.613,5.431-7.905,5.431-12.847    c0-4.948-1.81-9.232-5.431-12.847c-3.61-3.617-7.898-5.428-12.847-5.428h-73.08v-37.691    c41.299-4.565,75.985-22.408,104.061-53.526c28.076-31.117,42.12-67.711,42.12-109.776v-36.547    C401.998,196.049,400.185,191.77,396.563,188.15z" fill="#08ef08"/>
-
-</svg>
-
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="20px" width="20px" version="1.1" id="Capa_2" x="0px" y="0px" viewbox="0 0 475.092 475.092" style="enable-background:new 0 0 475.092 475.092;" xml:space="preserve" data-ng-if="muteAudioStatus==false" data-ng-click="unMuteAudio();" class="inactive">
-
-		<path d="M113.922,269.803c-2.856-11.419-4.283-22.172-4.283-32.26v-36.55c0-4.947-1.809-9.229-5.424-12.847    c-3.617-3.616-7.898-5.424-12.847-5.424c-4.952,0-9.235,1.809-12.851,5.424c-3.617,3.617-5.426,7.9-5.426,12.847v36.547    c0,21.129,3.999,41.494,11.993,61.106L113.922,269.803z" fill="#D80027"/>
-		<path d="M237.545,328.897c25.126,0,46.638-8.946,64.521-26.83c17.891-17.884,26.837-39.399,26.837-64.525v-36.547L431.972,97.929    c1.902-1.903,2.854-4.093,2.854-6.567c0-2.474-0.952-4.664-2.854-6.567l-23.407-23.413c-1.91-1.906-4.097-2.856-6.57-2.856    c-2.472,0-4.661,0.95-6.564,2.856L43.117,413.698c-1.903,1.902-2.852,4.093-2.852,6.563c0,2.478,0.949,4.668,2.852,6.57    l23.411,23.411c1.904,1.903,4.095,2.851,6.567,2.851c2.475,0,4.665-0.947,6.567-2.851l72.519-72.519    c20.933,12.949,43.299,20.656,67.093,23.127v37.691h-73.089c-4.949,0-9.235,1.811-12.847,5.428    c-3.618,3.613-5.43,7.898-5.43,12.847c0,4.941,1.812,9.233,5.43,12.847c3.612,3.614,7.898,5.428,12.847,5.428h182.718    c4.948,0,9.232-1.813,12.847-5.428c3.62-3.613,5.428-7.905,5.428-12.847c0-4.948-1.808-9.233-5.428-12.847    c-3.614-3.617-7.898-5.428-12.847-5.428h-73.087v-37.691c41.302-4.565,75.988-22.408,104.067-53.526    c28.072-31.117,42.11-67.711,42.11-109.776v-36.554c0-4.947-1.808-9.229-5.421-12.845c-3.621-3.617-7.902-5.426-12.851-5.426    c-4.945,0-9.229,1.809-12.847,5.426c-3.617,3.616-5.424,7.898-5.424,12.845v36.547c0,35.214-12.519,65.333-37.545,90.359    s-55.151,37.544-90.362,37.544c-20.557,0-40.065-4.849-58.529-14.561l27.408-27.401    C216.707,327.097,227.079,328.897,237.545,328.897z" fill="#D80027"/>
-        <path d="M290.223,16.849C274.518,5.618,256.959,0,237.545,0c-25.125,0-46.635,8.951-64.524,26.84    c-17.89,17.89-26.835,39.399-26.835,64.525v146.177L323.483,60.244C317.008,42.543,305.927,28.077,290.223,16.849z" fill="#D80027"/></svg>
-        <h1></h1>
-
-    </div>
-     </div>
-          </li>
-  
-        <li data-show-as="admin-presenter" style="">
-<div data-ng-controller="DemoController" data-ng-init="init(3)">
-    <div class="well2">
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_3" x="0px" y="0px" viewbox="0 0 455 455" style="enable-background:new 0 0 455 455;" xml:space="preserve" width="20px" height="20px"  data-ng-if="startRecordingStatus==true" data-ng-click="startRecording();" class="active">
-      <circle cx="227.5" cy="227.5" r="227.5" fill="#D80027"/>
-</svg>
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_3" x="0px" y="0px" viewbox="0 0 27.494 27.494" style="enable-background:new 0 0 27.494 27.494;" xml:space="preserve" width="20px" height="20px" data-ng-if="startRecordingStatus==false" data-ng-click="stopRecording();" class="inactive">
-      
-
-	<g id="c137_pause">
-		<path d="M13.747,0C6.155,0,0,6.154,0,13.747c0,7.594,6.155,13.747,13.747,13.747    c7.593,0,13.747-6.153,13.747-13.747C27.494,6.154,21.34,0,13.747,0z M11.937,20.483c0,0.177-0.144,0.322-0.318,0.322h-2.68    c-0.177,0-0.317-0.146-0.317-0.322V7.007c0-0.172,0.141-0.317,0.317-0.317h2.68c0.175,0,0.318,0.146,0.318,0.317V20.483z     M18.875,20.483c0,0.177-0.145,0.322-0.318,0.322h-2.681c-0.174,0-0.319-0.146-0.319-0.322V7.007c0-0.172,0.146-0.317,0.319-0.317    h2.681c0.174,0,0.318,0.146,0.318,0.317V20.483z" fill="#006DF0"/>
-</g>
-</svg>
-
-    </div>
-    </div>
-    </li>
-        <li data-show-as="admin-presenter">     
- <div class="dropdown">     
-<div data-ng-controller="DemoController" data-ng-init="init(4)">
-    <div class="well2">
-     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" fill="#ffd800"/></svg> 
-
-
-
-<div class="dropdown-content">
-    <section id="personalization">
-        <div>
-            <h2>Set Name</h2>
-            <input id="myName" type="text" />
-            <button class="cusbut" id="setName" onclick="saveMyName();">save</button><span id="myNameStatus"></span>
-        </div>
-    </section>
-    <section  id="constraints">
-            <div id="getUserMedia">
-            <div class="input">
-              <h2>Camera settings</h2>
-              <br />
-              <div id="minWidth">
-                <label>Min width <span>640</span>px:</label>
-                <input type="range" min="0" max="1920" value="640">
-              </div>
-              <div id="maxWidth">
-                <label>Max width <span>1280</span>px:</label>
-                <input type="range" min="0" max="1920" value="1280">
-              </div>
-              <div id="minHeight">
-                <label>Min height <span>480</span>px:</label>
-                <input type="range" min="0" max="1080" value="480">
-              </div>
-              <div id="maxHeight">
-                <label>Max height <span>720</span>px:</label>
-                <input type="range" min="0" max="1080" value="720">
-              </div>
-              <div id="framerate">
-                <label>Max Frame rate <span>20</span>fps:</label>
-                <input type="range" min="5" max="50" value="20">
-              </div>
-            </div>
-            <div id="getUserMediaConstraints" class="output"></div>
-          </div>
-    </section>
-  
-</div>
-
-    </div>
-    </div>
-    </div>
-    
-       
-        </li>
-
-      </ul>
-
-    </div>
-    <!-- new room top -->
-
-    <div class="clroom-mask" style="top:65px;"></div>
-
-    <!--conference room-->
-    <div class="clroom-body " id="wrapper">
-      <!-- applause area -->
-      <div class="clroom-applause-box" id="applause-area">
-          <div class="clroom-applause-box-chat" id="applause-info" style="display: none;">
-            <div class="left-prong">
-              <div class="prong-dk"></div>
-            </div>
-            <div class="clroom-applause-name">Mike David</div>
-            <div>Chat</div>
-          </div>
-
-          <div class="clroom-applause-box-chat-2" style="display: none;" id="applause-animate">
-            <!-- <div class="left-prong">
-              <div class="prong-dk"></div>
-            </div> -->
-            <div class="clroom-applause-box-chat-applause"><img alt="Applause_img" src="assets/applause.png"></div>
-          </div>
-
-          <div class="clroom-applause-people">
-            <div class="clroom-applause-people-icon"><img alt="Applause-people" src="assets/applause.png"></div>
-            <div class="clroom-applause-people-numb" id="applause-count" data-total="0">0</div>
-          </div>
-
-          <ul class="clroom-applause-box-list">
-          </ul>
-          <div class="clroom-applause-btn"><a href="#" id="applause"><img alt="Applause_img" src="assets/applause_img-98b930cf9bb07685640a3a03797f02ed.png"></a></div>
+           	</div>
+             </div>
       </div>
-      <!-- /applause area -->
-      <!--white space-->
-      <div id="arena" class="clroom-whitespace-box">
-        <!--room body nav-->
-        <ul id="arena-tab" class="clroom-whitespace-nav" style="display: none">
-          <li style="display: none">
-            <button class=""><span class="room-list-videos"></span></button>
-          </li>
-          <li style="display: none">
-            <button class="onactive"><span class="room-peoplepresentation"></span></button>
-          </li>
-          <li>
-            <div class="clroom-whitespace-resize">
-              <span class="room-resize"></span>
-              <span class="room-resize-1"></span>
-            </div>
-          </li>
-          <li>
-            <div class="clroom-whitespace-recording" style="display:none;"><span></span> RECORDING</div>
-          </li>
-          <li>
-            <div class="recording-tips" style="display: none;"></div>
-          </li>
-        </ul>
-        <!--room body white space-->
-
-        <!--blank state bg-->
-        <div id="video" class="grid">
-          <div style="position: relative;" id="video-focus">
-            <!-- slider start -->
-            <!--white space ppt-->
-            
-            <!-- slider end -->
-           
-            <div style="display: none;" id="video-share-container">
-              <div id="video-share-inner-container">
-                <div id="video-share"></div>
-              </div>
-              <div class="clroom-video-overlay-play"></div>
-              <div class="clroom-video-controlbox">
-                <!--video time rail-->
-                <div class="clroom-video-timerail">
-                  <div class="clroom-video-time-total progress-bar video-share-control">
-                    <div class="clroom-video-time-loaded"></div>
-                    <div class="clroom-video-time-current elapsed" id="elapsed-progress" style="width:0%;"></div>
-                    <div class="clroom-video-time-handle" id="elapsed-progress-handle" style="left:0%;">
-                      <button><span></span></button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="clroom-video-control">
-
-                  <!--play and pause button-->
-                  <div class="clroom-video-playbutton">
-                    <button class="play-pause-video-button video-share-control">
-                      <span class="room-play"></span>
-                      <span class="room-pause"></span>
-                    </button>
-                  </div>
-
-                  <!--volume button-->
-                  <div class="clroom-video-volumebutton ">
-                    <button class="mute-unmute-video-button video-share-control">
-                      <span class="room-volume"></span>
-                      <span class="room-volume-mute"></span>
-                    </button>
-                  </div>
-
-                  <div class="clroom-video-volume-slider volume-bar video-share-control" volume-value="100">
-                    <div class="clroom-video-volume-total"></div>
-                    <div class="clroom-video-volume-current" style="width:100%;"></div>
-                    <div class="clroom-video-volume-handle" style="right:0%;">
-                      <button></button>
-                    </div>
-                  </div>
-
-                  <!--video time-->
-                  <div class="clroom-video-time"><span id="video-current-elapse">00:00:00</span> /
-                    <span id="total-video-duration">00:00:00</span></div>
-                  <div class="clroom-end-video-button remove-youtube-video-link" id="end-youtube-video-button">
-                    <span class="room-delete"></span>Remove Video
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            <!-- youtube end -->
-            <!-- mp4 video start -->
-            <div id="mp4-share-container">
-              <div id="mp4-share-inner-container">
-              </div>
-              <div class="clroom-video-overlay-play">
-                <div class="clroom-video-overlay-play-icon"><img alt="Btn-play" src="assets/btn-play-c6d2abc8673e2211fe03292ddd562544.png"></div>
-                <div class="clroom-video-overlay-play-status"></div>
-              </div>
-              <div class="clroom-video-controlbox">
-                <!--video time rail-->
-                <div class="clroom-video-timerail">
-                  <div class="clroom-video-time-total progress-bar video-share-control">
-                    <div class="clroom-video-time-loaded"></div>
-                    <div class="clroom-video-time-current elapsed" id="mp4-elapsed-progress" style="width:0%;"></div>
-                    <div class="clroom-video-time-handle" id="mp4-elapsed-progress-handle" style="left:0%;">
-                      <button><span></span></button>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="clroom-video-control">
-
-                  <!--play and pause button-->
-                  <div class="clroom-video-playbutton">
-                    <button class="play-pause-video-button video-share-control">
-                      <span class="room-play"></span>
-                      <span class="room-pause"></span>
-                    </button>
-                  </div>
-
-                  <!--volume button-->
-                  <div class="clroom-video-volumebutton ">
-                    <button class="mute-unmute-video-button video-share-control">
-                      <span class="room-volume"></span>
-                      <span class="room-volume-mute"></span>
-                    </button>
-                  </div>
-
-                  <div class="clroom-video-volume-slider volume-bar video-share-control" volume-value="100">
-                    <div class="clroom-video-volume-total"></div>
-                    <div class="clroom-video-volume-current" style="width:100%;"></div>
-                    <div class="clroom-video-volume-handle" style="right:0%;">
-                      <button></button>
-                    </div>
-                  </div>
-
-                  <!--video time-->
-                  <div class="clroom-video-time"><span id="mp4-current-elapse">00:00:00</span> /
-                    <span id="total-mp4-duration">00:00:00</span></div>
-                  <div class="clroom-end-video-button remove-mp4-video-link" id="end-mp4-video-button">
-                    <span class="room-delete"></span>Remove Video
-                  </div>
-                </div>
-
-              </div>
-            </div>
-            <!-- mp4 video start -->
-          <div class="resize-triggers"><div class="expand-trigger"><div style="width: 1030px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 743px; height: 1px;"></div></div><div class="contract-trigger"></div></div><div class="resize-triggers"><div class="expand-trigger"><div style="width: 1401px; height: 1px;"></div></div><div class="contract-trigger"></div></div></div>
-          <ul id="video-list" class="clear video-3 all-audios">
-          </ul>
-          <ul id="audio-list" class="close">
-          </ul>
-        </div>
-        <!-- single cam share box -->
-        <div style="left: 15px; bottom: 15px;" class="clroom-attendeer-video on-leftbottom" id="single-cam-share-box">
-          <div class="clroom-attendeer-status-box">
-            <div class="clroom-attendeer-status-voice">
-              <div class="clroom-attendeer-status-voice-in" style="width: 0px;"></div>
-            </div>
-            <div class="classroom-attendeer-status-name"></div>
-            <div class="classroom-attendeer-status-connection perfect-connection">
-              <span class="perfect-connection-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
-                  <rect id="Rectangle-293" x="1.468" y="11.329" fill="#64D27B" width="4.152" height="3.114"></rect>
-                  <rect id="Rectangle-293_1_" x="6.658" y="7.177" fill="#64D27B" width="4.152" height="7.267"></rect>
-                  <rect id="Rectangle-293_2_" x="11.848" y="4.062" fill="#64D27B" width="4.152" height="10.382"></rect>
-                  <polygon fill="#64D27B" points="6.658,1.557 3.025,5.188 1.468,3.633 0,5.101 1.557,6.657 3.025,8.125 4.493,6.657 8.125,3.023     "></polygon>
-                </svg>
-              </span>
-              <span class="poor-connection-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
-                  <rect id="Rectangle-293" x="1.693" y="11.277" fill="#FF224F" width="4.087" height="3.064"></rect>
-                  <rect id="Rectangle-293_1_" x="6.803" y="7.189" fill="#CCD0D3" width="4.087" height="7.153"></rect>
-                  <rect id="Rectangle-293_2_" x="11.912" y="4.124" fill="#CCD0D3" width="4.088" height="10.219"></rect>
-                  <polygon fill="#EB1A46" points="7.226,3.103 5.78,1.657 3.613,3.825 1.445,1.657 0,3.103 2.168,5.271 0,7.438 1.445,8.883    3.613,6.716 5.78,8.883 7.226,7.438 5.059,5.271  "></polygon>
-                </svg>
-              </span>
-              <span class="good-connection-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="16px" height="16px" viewbox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
-                  <rect id="Rectangle-293" y="10.286" fill="#FFD80F" width="4.571" height="3.428"></rect>
-                  <rect id="Rectangle-293_1_" x="5.714" y="5.715" fill="#FFD80F" width="4.572" height="7.999"></rect>
-                  <rect id="Rectangle-293_2_" x="11.43" y="2.286" fill="#CCD0D3" width="4.57" height="11.428"></rect>
-                </svg>
-              </span>
-            </div>
-          </div>
-          <div class="clroom-attendeer-arrs" style="display: block">
-            <div class="clroom-attendeer-arr-l">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
-                  <path d="M452.563 23.517c24.112 23.571 26.004 56.388 0 85.203l-202.574 211.279 202.574 211.279c26.004 28.816 24.112 61.686 0 85.096-24.058 23.571-64.713 22.058-87.312 0-22.599-21.949-243.392-253.827-243.392-253.827-12.056-11.731-18.111-27.139-18.111-42.548s6.054-30.816 18.111-42.656c0 0 220.794-231.769 243.392-253.827 22.599-22.112 63.254-23.571 87.312 0z"></path>
-                </svg>
-              </span>
-            </div>
-            <div class="clroom-attendeer-arr-b">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
-                  <path d="M23.517 187.438c23.571-24.112 56.388-26.004 85.204 0l211.279 202.574 211.279-202.574c28.816-26.004 61.686-24.112 85.096 0 23.571 24.058 22.058 64.713 0 87.312-21.949 22.599-253.827 243.393-253.827 243.393-11.731 12.056-27.139 18.111-42.548 18.111s-30.816-6.054-42.656-18.111c0 0-231.769-220.794-253.827-243.392-22.112-22.599-23.571-63.254 0-87.312z"></path>
-                </svg>
-              </span>
-            </div>
-            <div class="clroom-attendeer-arr-r">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
-                  <path d="M274.749 23.517c22.599 22.058 243.392 253.826 243.392 253.826 12.056 11.84 18.111 27.248 18.111 42.656s-6.054 30.816-18.111 42.548c0 0-220.794 231.877-243.392 253.826-22.599 22.058-63.254 23.571-87.312 0-24.112-23.464-26.004-56.279 0-85.096l202.574-211.279-202.574-211.279c-26.004-28.816-24.112-61.686 0-85.203 24.058-23.571 64.713-22.112 87.312 0z"></path>
-                </svg>
-              </span>
-            </div>
-            <div class="clroom-attendeer-arr-t">
-              <span>
-                <svg xmlns="http://www.w3.org/2000/svg" xlink="http://www.w3.org/1999/xlink" version="1.1" width="640" height="640" viewbox="0 0 640 640">
-                  <path d="M85.714 466.753c-18.575 18.371-48.598 18.371-67.037 0s-18.644-48.049 0-66.42l267.872-262.525c18.507-18.371 48.461-18.371 67.105 0l267.872 262.525c18.507 18.301 18.507 48.049 0 66.42-18.575 18.371-48.598 18.371-67.105 0l-234.422-215.297-234.286 215.297z"></path>
-                </svg>
-              </span>
-            </div>
-          </div>
-          <ul id="single-cam-share">
-          </ul>
-        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script type="text/javascript" src="{% static 'js/common.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/recording.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/meetings.js' %}"></script>
+	  <script type="text/javascript"> 
+	  	  $(document).ready(function() {
+	  		trace("using ice "+ '{{ ice_uri }}');
+	        connect('{{ ice_uri }}');
+	  	  });
+	    </script>    
      
-      </div>
-   
+ </body>
+</html>
 
-<!--people and chat-->
-
-
-      <!--people and chat-->
-
-      <div id="management">
-      </div>
-    </div>
-   
-
-
-
-</div>
-</div>
-
-<script async="" src="/static/assets/www-widgetapi.js" id="www-widgetapi-script" type="text/javascript"></script><script src="/static/assets/iframe_api"></script><script src="/static/assets/htymjs.js" type="text/javascript"></script>
-      <link href="/static/lib/jquery-ui/themes/default/jquery-ui.css" rel="stylesheet" type="text/css" />
-    <link href="/static/src/jquery-lwd/themes/default/jquery-lwd.css" rel="stylesheet" type="text/css" />
-
-    <script type="text/javascript" src="/static/lib/jquery-ui/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/lib/jquery-ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/static/src/jquery-lwd/jquery-lwd.js"></script>
-    <script type="text/javascript" src="{% static "js/common.js" %}"></script>
-    <script type="text/javascript" src="{% static "js/recording.js" %}"></script>
-    <script type="text/javascript" src="{% static "js/meetings.js" %}"></script>
-  
-  <script type="text/javascript"> 
-        connect('{{ ice_uri }}');
-    </script>
-
-    <script>
-        $(document).ready(function () {
-            $("#test").parent().css({ "color": "red", "height": "200px", "width": "250px", "left": "580px", "top": "315px" });
-            $("#test").css("height", 173);
-        });
-    </script>
-
-</body></html>

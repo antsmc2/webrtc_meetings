@@ -50,6 +50,13 @@ logs/*log*
 
 #db file
 *.sqlite3
+*.db
+*.rdb
 
 #exclude migrations
-*/migrations/*
+*/migrations/
+
+# cert keys
+*.crt
+*.key
+

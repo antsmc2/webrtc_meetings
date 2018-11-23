@@ -1,6 +1,5 @@
 python-Levenshtein
 Django==1.8.1
-psycopg2==2.5
 django-model-utils
 dateutils
 supervisor

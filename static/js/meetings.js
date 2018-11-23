@@ -6,7 +6,7 @@
 
 var myHostname = window.location.hostname;
 var myPort = window.location.port;
-console.log("Hostname: " + myHostname);
+trace("Hostname: " + myHostname);
 var uniqueId = null;
 var myName = '';
 var serverUrl = null;
@@ -16,17 +16,17 @@ var peers = {};
 var dataChannels = {};
 var remoteVideos = {};
 var receivedFiles = {};
-var minWidthInput = document.querySelector('div#minWidth input');
-var maxWidthInput = document.querySelector('div#maxWidth input');
-var minHeightInput = document.querySelector('div#minHeight input');
-var maxHeightInput = document.querySelector('div#maxHeight input');
-var framerateInput = document.querySelector('div#framerate input');
+var minWidthInput = document.querySelector('#minWidth input');
+var maxWidthInput = document.querySelector('#maxWidth input');
+var minHeightInput = document.querySelector('#minHeight input');
+var maxHeightInput = document.querySelector('#maxHeight input');
+var framerateInput = document.querySelector('#framerate input');
 minWidthInput.onchange = maxWidthInput.onchange =
     minHeightInput.onchange = maxHeightInput.onchange =
     framerateInput.onchange = displayRangeValue;
 var getUserMediaConstraintsDiv =
     document.querySelector('div#getUserMediaConstraints');
-var fileInput = document.querySelector('input#fileInput');
+var fileInput = document.querySelector('#fileInput');
 var downloadSection = document.querySelector('#downloads');
 var sendProgress = document.querySelector('progress#sendProgress');
 var receiveProgress = document.querySelector('progress#receiveProgress');
@@ -45,6 +45,7 @@ var setNameButton = document.querySelector('#setName');
 var myNameField = document.querySelector('#myName');
 var myNameStatus = document.querySelector('#myNameStatus');
 var peopleCount = document.querySelector('#peopleCount');
+
 
 
 fileInput.onchange = function () {
@@ -75,6 +76,7 @@ localVideo.addEventListener('loadedmetadata', function() {
 
 // EXCHANGE MESSAGES //
 var JOINED_ROOM = 'JOINED-ROOM';
+var LEFT_ROOM = 'LEFT-ROOM';
 var OFFER_REQUEST = 'OFFER';
 var OFFER_ANSWER  = 'ANSWER';
 var NEW_ICE_FOUND = 'NEW-ICE-FOUND';
@@ -140,38 +142,36 @@ function restartIce(peer_id) {
 }
 
 
-function refreshVideos() {
-    //redraw all available videos loop through available peers
-    for(peer_id in obj){
-
-    }
-
-}
 function onCreateSessionDescriptionError(error) {
   trace('Failed to create session description: ' + error.toString());
 }
 
 function gotRemoteStream(e, peer_id) {
+  trace('Received local stream');
   makeRemoteVideo(peer_id);
+  
   var remoteVideo = document.getElementById('v'+ peer_id);
   remoteVideo.srcObject = e.stream;
-  remoteVideo.src = window.URL.createObjectURL(e.stream);
-  remoteVideo.id = peer_id;
-  remoteVideo.class = 'video-stream';
-   remoteVideo.height = '100%';
-  remoteVideo.width = '100%';
+//  remoteVideo.id = peer_id;
   remoteVideo.autoplay = true;
   attachRemoteVideo(peer_id, remoteVideo);
-  trace('received remote stream from: ' + peer_id);
+  trace('received remote stream from: ' + peer_id);;
 }
 
-function makeRemoteVideo(peer_id) {
-	var video_component = '<li class="av" id="li' + peer_id + '"><video autoplay="autoplay"' + 
-      'id="v' + peer_id + '" class="stream"></video><div class="stream-bg"><div class="room-loading"><span class="room-facetime-videos"></span><p>loading...</p></div></div><div style="bottom: 0px; background-size: 48.8189% 15%; width: 545px; left: 0px;" class="video-uname">guest-' + peer_id + '</div></li>';
-    videoContainer.innerHTML = videoContainer.innerHTML + video_component;
+function makeRemoteVideo(peerId) {
+	var containerId = "cont_" + peerId ;
+	var remoteVideoContainer = document.createElement("div");
+	remoteVideoContainer.className = "col";
+	remoteVideoContainer.id = containerId;
+	remoteVideoContainer.innerHTML = '<div class="embed-responsive embed-responsive-16by9">' +
+    '<video autoplay="autoplay" id="v' + peerId + '" class="embed-responsive-item videos" /></div>'
+    + '<div class="container"><p class="peerId" /></div>';
+    videoContainer.appendChild(remoteVideoContainer);
+	addToggleFullScreen(remoteVideoContainer);
 }
 
 function sendThroughServer(msg) {
+  msg['displayName'] = myName;		// current user display Name if any
   trace("Sending '" + msg.type + "' message: " + msg);
   var msgJSON = JSON.stringify(msg);
 //  switch (connection.readyState) {
@@ -185,12 +185,21 @@ function sendThroughServer(msg) {
 
 function connect(ice_uri) {
   iceURI = ice_uri;
+  trace('using ice uri: ' + iceURI);
   if(!uniqueId)
     uniqueId = generateUniqueId();
   if(!myName)
     myName = uniqueId;
   var scheme = "ws";
-
+  if(URLSearchParams) {
+	  const urlParams = new URLSearchParams(window.location.search);
+	  const suggestedName = urlParams.get("myName");
+	  if(suggestedName != null) {
+		  myNameField.value = suggestedName;
+		  saveMyName();
+	  }  
+		  
+  }
   // If this is an HTTPS connection, we have to use a secure WebSocket
   // connection too, so add another "s" to the scheme.
   serverUrl = encodeURI(document.URL);
@@ -204,8 +213,7 @@ function connect(ice_uri) {
           iceServers = JSON.parse(xhttp.responseText);
        }
   };
- trace('using ice uri: ' + iceURI);
- trace('ice servers',iceServers);
+ trace('ice servers', iceServers);
  xhttp.open("GET", iceURI, true);
  xhttp.send();
  trace('my unique id: ' + uniqueId);
@@ -257,6 +265,8 @@ function handleServerMsg(msg_string) {
       return handleNewICECandidateMsg(msg);
     case TEXT_MESSAGE:
       return updateChat(msg, TEXT_MESSAGE);
+    case LEFT_ROOM:
+        return handleGuestLeft(msg.name);
   }
 
   trace('unknown message: ' + msg);
@@ -278,6 +288,7 @@ function start(onMediaInit) {
   .then(function(stream) {
       trace('got user media');
       gotLocalStream(stream); //this is the self stream.
+      trace('setting local stream....');
       if(onMediaInit) {
         onMediaInit();
       }
@@ -287,6 +298,7 @@ function start(onMediaInit) {
   })
   .catch(function(e) {
     alert('getUserMedia() error: ' + e.name);
+    throw e;
   });
 }
 
@@ -295,21 +307,27 @@ function gotLocalStream(stream) {
   localVideoContainer.innerHTML = '';
   localVideo = document.createElement('video');
   localVideoContainer.appendChild(localVideo);
-  localVideo.src = window.URL.createObjectURL(stream);
   localVideo.srcObject = stream;
-  localVideo.id = uniqueId;
-  localVideo.class = 'video-stream';
+  localVideo.id = 'v'+uniqueId;
   localVideo.autoplay = true;
   localVideo.muted = "muted";
+  localVideo.allowfullscreen="true"
+  localVideo.className = "embed-responsive-item videos";
   localStream = stream;
   window.stream = localStream;
   enableButtons();
-  trace('done setting local stream');
+  trace('done setting local stream ');
+  addToggleFullScreen(localVideoContainer);
 }
 
 function announcePresence() {
     /* This basically announces that  */
     return sendThroughServer({'type' : JOINED_ROOM, 'name' : uniqueId});
+}
+
+function announceDropOut() {
+    /* This basically announces that  */
+    return sendThroughServer({'type' : LEFT_ROOM, 'name' : uniqueId});
 }
 
 function resetPeers() {
@@ -363,22 +381,21 @@ function handleGuest(peer_id) {
 
 function handleGuestLeft(peer_id) {
     trace(peer_id + ' left! cleaning up...');
-    muteVideo(peer_id);
-    muteAudio(peer_id);
     peers[peer_id].close();
     delete peers[peer_id];
     removeRemoteVideo(peer_id);
 }
 
-function attachRemoteVideo(peer_id, remoteVideo) {
-    remoteVideos[peer_id] = remoteVideo;
+function attachRemoteVideo(peer_id, remoteStreamObj) {
+    remoteVideos[peer_id] = remoteStreamObj;
 }
 
 function removeRemoteVideo(peer_id) {
+	trace("Stopping Video");
     if(remoteVideos[peer_id])
     {
         delete remoteVideos[peer_id];
-        var liElement = document.getElementById('li'+peer_id);
+        var liElement = document.getElementById('cont_' + peer_id);
         videoContainer.removeChild(liElement);
     }
 }
@@ -436,9 +453,10 @@ function handleICEConnectionStateChangeEvent(event, peer_id) {
   switch(peerConnection.iceConnectionState) {
     case "closed":
     case "failed":
-    //case "disconnected": removing this becos some networks might still recover
+//    case "disconnected": 
       //updateChat({text: peer_id + ' disconnected.'});
       //closeVideoCall();
+      handleGuestLeft(peer_id);
       refreshAttendantsCount();
       break;
     case "completed":
@@ -600,7 +618,7 @@ function setUpDataChannel(peer_id) {
 }
 
 function refreshAttendantsCount() {
-	peopleCount.textContent = Object.keys(peers).length + 1;
+	//peopleCount.textContent = Object.keys(peers).length + 1;
 }
 
 
@@ -708,20 +726,20 @@ function postToChat(speakerName, content, date) {
    '<div class="clroom-groupchat-name"><a href="javascript:void(0);">' + speakerName + '</a><div class="clroom-groupchat-date">'+
    timeStr + '</div></div><div class="clroom-groupchat-text">' + content + '</div><ul class="clroom-group-chat-subnav">' +
    '<li><a href="javascript:void(0);" class="subnav-delete" style="display: block"></a></li></ul></div></div></li>';
-  chatPane.innerHTML = chatPane.innerHTML + text;
-  document.querySelector('#chat-message .chat:last-of-type').scrollIntoView();    
+ // chatPane.innerHTML = chatPane.innerHTML + text;
+  //document.querySelector('#chat-message .chat:last-of-type').scrollIntoView();    
 }
 
 
 function enableChat() {
-    sendMsgButton.disabled = false;
-    chatBox.disabled = false;
+//    sendMsgButton.disabled = false;
+//    chatBox.disabled = false;
 }
 
 function disableChat() {
     //dont expect to disabe the chat after it has been enabled initially
-    sendMsgButton.disabled = true;
-    chatBox.disabled = true;
+//    sendMsgButton.disabled = true;
+//    chatBox.disabled = true;
 }
 
 
@@ -852,18 +870,17 @@ function toggleCall() {
 
 function stopCall() {
     if(localStream && localStream.getTracks()) {
-        localStream.getTracks().forEach(function(track) {
-        	track.stop();
-        });
+        localStream.getTracks().forEach(track => track.stop());
         localStream = null;
         localVideo.src = null;
         localVideo.srcObject = null;
-        myVideoContainer.removeChild(localVideo);
+        localVideoContainer.removeChild(localVideo);
         localVideo = null;
         for(var peer_id in peers) {
             handleGuestLeft(peer_id);
         }
     }
+    announceDropOut();
     connection.close();
     connection = null;
     resetButtons();
@@ -877,8 +894,8 @@ function restartCall() {
 }
 
 function resetButtons() {
-    muteAudioButton.textContent = 'mute';
-    muteVideoButton.textContent = 'mute';
+    muteAudioButton.textContent = 'Mute Audio';
+    muteVideoButton.textContent = 'Mute Video';
 }
 
 function enableButtons() {
@@ -948,7 +965,7 @@ function handleKey(evt) {
 }
 
 function saveMyName() {
-    myName = myNameField.value + '-' + uniqueId;
+    myName = myNameField.value;
     trace('my name now set to: ' + myName);
     myNameStatus.textContent = 'saved!';
     setTimeout(function(){ myNameStatus.textContent = ''; }, 1000);
@@ -958,5 +975,36 @@ function triggerFileSelect() {
     if (!sendMsgButton.disabled)
    	 fileInput.click();
     return false;
+}
+
+function toggleFullscreen(elem) {
+	  if (!document.fullscreenElement && !document.mozFullScreenElement &&
+	    !document.webkitFullscreenElement && !document.msFullscreenElement) {
+	    if (elem.requestFullscreen) {
+	      elem.requestFullscreen();
+	    } else if (elem.msRequestFullscreen) {
+	      elem.msRequestFullscreen();
+	    } else if (elem.mozRequestFullScreen) {
+	      elem.mozRequestFullScreen();
+	    } else if (elem.webkitRequestFullscreen) {
+	      elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+	    }
+	  } else {
+	    if (document.exitFullscreen) {
+	      document.exitFullscreen();
+	    } else if (document.msExitFullscreen) {
+	      document.msExitFullscreen();
+	    } else if (document.mozCancelFullScreen) {
+	      document.mozCancelFullScreen();
+	    } else if (document.webkitExitFullscreen) {
+	      document.webkitExitFullscreen();
+	    }
+	  }
+}
+
+function addToggleFullScreen(elem) {
+	elem.addEventListener('click', function(event) {
+		  toggleFullscreen(event.target || event.srcElement);
+	});
 }
 
