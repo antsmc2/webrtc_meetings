@@ -38,8 +38,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'cacheops',
-    'django_rq',
-    'django_rq_dashboard',
     'channels',
     'timezone_field',
     'service_access',
@@ -142,15 +140,6 @@ CACHEOPS = {
                          'timeout': CACHE_REFRESH_DURATION}, #refresh every 3 hrs
     'auth.user': {'ops': 'all',
                    'timeout': CACHE_REFRESH_DURATION},  #refresh every 3 hrs
-}
-
-RQ_QUEUES = {
-    'default': {
-    'HOST': 'localhost',
-    'PORT': 6379,
-    'DB': 0,
-    'DEFAULT_TIMEOUT': 360,
-    },
 }
 
 HTTP_AUTH_REALM = 'meeting-room'
