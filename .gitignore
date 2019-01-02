@@ -39,7 +39,7 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-
+.settings/
 localsettings.py
 *.log
 *.csv
