@@ -11,8 +11,10 @@ var uniqueId = null;
 var myName = '';
 var serverUrl = null;
 var localStream = null;
+var localScreenStream = null;
 var iceURI = null;
 var peers = {};
+var senders = {};
 var dataChannels = {};
 var remoteVideos = {};
 var receivedFiles = {};
@@ -33,12 +35,14 @@ var receiveProgress = document.querySelector('progress#receiveProgress');
 var statusMessage = document.querySelector('span#fileStatus');
 var muteAudioButton = document.getElementById('muteAudio');
 var muteVideoButton = document.getElementById('muteVideo');
+var screenShareButton = document.getElementById('shareScreenButton');
 var toggleCallButton = document.getElementById('toggleCall');
 var receiveProgressLabel = document.getElementById("receiveProgressLabel");
 var chatPane = document.getElementById("chat-message");
 toggleCallButton.onclick = toggleCall;
 muteVideoButton.onclick = toggleMuteVideo;
 muteAudioButton.onclick = toggleMuteAudio;
+screenShareButton.onclick =  toggleScreenShare;
 var chatBox = document.querySelector('#chat_input_value');
 var sendMsgButton = document.querySelector('#post_message');
 var setNameButton = document.querySelector('#setName');
@@ -148,10 +152,12 @@ function onCreateSessionDescriptionError(error) {
 
 function gotRemoteStream(e, peer_id) {
   trace('Received local stream');
-  makeRemoteVideo(peer_id);
-  
+  if(remoteVideos[peer_id])
+	removeRemoteVideo(peer_id, true);
+  else
+	makeRemoteVideo(peer_id);		// only create the video element if the peer_id never existed in first place.
   var remoteVideo = document.getElementById('v'+ peer_id);
-  remoteVideo.srcObject = e.stream;
+  remoteVideo.srcObject = e.streams[0];
 //  remoteVideo.id = peer_id;
   remoteVideo.autoplay = true;
   attachRemoteVideo(peer_id, remoteVideo);
@@ -287,7 +293,8 @@ function start(onMediaInit) {
   navigator.mediaDevices.getUserMedia(mediaConstraints)
   .then(function(stream) {
       trace('got user media');
-      gotLocalStream(stream); //this is the self stream.
+      localStream = stream;
+      setVideoStream(stream); //this is the self stream.
       trace('setting local stream....');
       if(onMediaInit) {
         onMediaInit();
@@ -302,7 +309,37 @@ function start(onMediaInit) {
   });
 }
 
-function gotLocalStream(stream) {
+
+function refreshStream(stream) {
+	setVideoStream(stream);
+	for(var peer_id in peers) {
+		var track = stream.getVideoTracks()[0];
+		senders[peer_id].replaceTrack(track);
+	}
+}
+
+
+function startScreenShare() {
+	  /*
+	  Mostly replicates start(), except that the stream is gotten from the screen/window instead.
+	  In addition, it kills existing stream, replacing local stream with gotten from screen/window
+	  **/
+	  trace('Requesting display stream');
+	  getScreen()
+	  .then(function(stream) {
+	      trace('got display media');
+	      localScreenStream = stream;
+	      refreshStream(localScreenStream);
+	  })
+	  .catch(function(e) {
+	    alert('error getting screen: ' + e.name);
+	    throw e;
+	  });
+	}
+
+
+
+function setVideoStream(stream) {
   trace('Received local stream');
   localVideoContainer.innerHTML = '';
   localVideo = document.createElement('video');
@@ -313,8 +350,7 @@ function gotLocalStream(stream) {
   localVideo.muted = "muted";
   localVideo.allowfullscreen="true"
   localVideo.className = "embed-responsive-item videos";
-  localStream = stream;
-  window.stream = localStream;
+  window.stream = stream;
   enableButtons();
   trace('done setting local stream ');
   addToggleFullScreen(localVideoContainer);
@@ -336,7 +372,7 @@ function resetPeers() {
 }
 
 function makeOrGetPeer(id) {
-  if(peers[id] !== undefined)
+  if(peers[id] !== undefined) 
      return peers[id];
   var peerConnection = new RTCPeerConnection({
         iceServers: getIceServers()
@@ -347,7 +383,7 @@ function makeOrGetPeer(id) {
   peerConnection.oniceconnectionstatechange = function(e) {
                 handleICEConnectionStateChangeEvent(e, id);
   };
-  peerConnection.onaddstream = function(e) {
+  peerConnection.ontrack = function(e) {
         gotRemoteStream(e, id);
   }
 /**
@@ -357,7 +393,7 @@ function makeOrGetPeer(id) {
   }
  */
   peerConnection.onsignalingstatechange = function(e) {
-    var state = peers[id].signalingState;
+    var state = peerConnection.signalingState;
     trace(id + ' state changed to ' + state);
 //    switch(state){
 //        case "closed":
@@ -381,8 +417,11 @@ function handleGuest(peer_id) {
 
 function handleGuestLeft(peer_id) {
     trace(peer_id + ' left! cleaning up...');
-    peers[peer_id].close();
-    delete peers[peer_id];
+    if(peer_id in peers) {
+	    peers[peer_id].close();
+	    delete peers[peer_id];
+    }
+    delete senders[peer_id];
     removeRemoteVideo(peer_id);
 }
 
@@ -390,13 +429,18 @@ function attachRemoteVideo(peer_id, remoteStreamObj) {
     remoteVideos[peer_id] = remoteStreamObj;
 }
 
-function removeRemoteVideo(peer_id) {
+function removeRemoteVideo(peer_id, retainVideoContainer) {
 	trace("Stopping Video");
+	var deleteVideoElement = true;
+	if(retainVideoContainer === true)
+		deleteVideoElement = false;
     if(remoteVideos[peer_id])
     {
         delete remoteVideos[peer_id];
-        var liElement = document.getElementById('cont_' + peer_id);
-        videoContainer.removeChild(liElement);
+        if(deleteVideoElement) {
+	        var liElement = document.getElementById('cont_' + peer_id);
+	        videoContainer.removeChild(liElement);
+        }
     }
 }
 
@@ -490,7 +534,8 @@ function handleOfferRequest(msg) {
     onSetRemoteSuccess(peer_id);
     var peerConnection = makeOrGetPeer(peer_id);
     trace('Adding remote stream to: ' + peer_id);
-    peerConnection.addStream(localStream);
+    var track = localStream.getVideoTracks()[0];
+    senders[peer_id] = peerConnection.addTrack(track, localStream);
     trace(peer_id + ' createAnswer start');
       // Since the 'remote' side has no media stream we need
       // to pass in the right constraints in order for it to
@@ -544,8 +589,14 @@ function call(peer_id) {
   var peerConnection = makeOrGetPeer(peer_id);
   dataChannels[peer_id] = peerConnection.createDataChannel("chat", dataChannelOptions);
   setUpDataChannel(peer_id);
-  trace(peer_id + ' Adding remote stream to myPeerConnection');
-  peerConnection.addStream(localStream);
+  createOffer(peer_id);
+}
+
+function createOffer(peer_id) {
+  var peerConnection = makeOrGetPeer(peer_id);
+  trace(peer_id + ' Adding local stream to myPeerConnection');
+  var track = localStream.getVideoTracks()[0];
+  senders[peer_id] = peerConnection.addTrack(track, localStream);
   trace(peer_id + ' createOffer start');
   peerConnection.createOffer(offerOptions)
     .then(function(desc){
@@ -868,7 +919,20 @@ function toggleCall() {
 
 }
 
-function stopCall() {
+function toggleScreenShare() {
+    if(shareScreenButton.textContent.toLowerCase() == 'share screen'){
+    	if(!localScreenStream)
+    		startScreenShare();
+    	else refreshStream(localScreenStream);
+        shareScreenButton.textContent = 'Stop Screen Share';
+    }else{
+    	refreshStream(localStream); 
+        shareScreenButton.textContent = 'Share Screen';
+    }
+
+}
+
+function stopLocalStream() {
     if(localStream && localStream.getTracks()) {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
@@ -876,9 +940,21 @@ function stopCall() {
         localVideo.srcObject = null;
         localVideoContainer.removeChild(localVideo);
         localVideo = null;
-        for(var peer_id in peers) {
-            handleGuestLeft(peer_id);
-        }
+    }
+}
+
+function stopScreenStream() {
+    if(localScreenStream && localScreenStream.getTracks()) {
+    	localScreenStream.getTracks().forEach(track => track.stop());
+    	localScreenStream = null;
+    }
+}
+
+function stopCall() {
+	stopLocalStream();
+	stopScreenStream();
+	for(var peer_id in peers) {
+        handleGuestLeft(peer_id);
     }
     announceDropOut();
     connection.close();
@@ -896,6 +972,7 @@ function restartCall() {
 function resetButtons() {
     muteAudioButton.textContent = 'Mute Audio';
     muteVideoButton.textContent = 'Mute Video';
+    shareScreenButton.textContent = 'Share Screen';
 }
 
 function enableButtons() {
@@ -1008,3 +1085,15 @@ function addToggleFullScreen(elem) {
 	});
 }
 
+function enableMeetingScreenCapture() {
+	if (adapter.browserDetails.browser == 'firefox') {
+		  adapter.browserShim.shimGetDisplayMedia(window, 'screen');
+	}
+}
+
+
+function getScreen() {
+	//enable media if not already done
+	enableMeetingScreenCapture();
+	return window.navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+}
