@@ -14,7 +14,8 @@ var localStream = null;
 var localScreenStream = null;
 var iceURI = null;
 var peers = {};
-var senders = {};
+var audioSenders = {};
+var videoSenders = {};
 var dataChannels = {};
 var remoteVideos = {};
 var receivedFiles = {};
@@ -123,10 +124,10 @@ function getUserMediaConstraints() {
     constraints.video.height = constraints.video.height || {};
     constraints.video.height.max = maxHeightInput.value;
   }
-  if (framerateInput.value !== '0') {
-    constraints.video.frameRate = {};
-    constraints.video.frameRate.max = framerateInput.value;
-  } 
+//  if (framerateInput.value !== '0') {
+//    constraints.video.frameRate = {};
+//    constraints.video.frameRate.max = framerateInput.value;
+//  } 
   return constraints;
 }
 
@@ -313,8 +314,10 @@ function start(onMediaInit) {
 function refreshStream(stream) {
 	setVideoStream(stream);
 	for(var peer_id in peers) {
-		var track = stream.getVideoTracks()[0];
-		senders[peer_id].replaceTrack(track);
+		var videoTrack = stream.getVideoTracks()[0];
+		videoSenders[peer_id].replaceTrack(videoTrack);
+		var audioTrack = localStream.getAudioTracks()[0];	// using audio from localStream to enable synchronicity with mute/unmute button. 
+		audioSenders[peer_id].replaceTrack(audioTrack);
 	}
 }
 
@@ -421,7 +424,8 @@ function handleGuestLeft(peer_id) {
 	    peers[peer_id].close();
 	    delete peers[peer_id];
     }
-    delete senders[peer_id];
+    delete audioSenders[peer_id];
+    delete videoSenders[peer_id];
     removeRemoteVideo(peer_id);
 }
 
@@ -534,8 +538,10 @@ function handleOfferRequest(msg) {
     onSetRemoteSuccess(peer_id);
     var peerConnection = makeOrGetPeer(peer_id);
     trace('Adding remote stream to: ' + peer_id);
-    var track = localStream.getVideoTracks()[0];
-    senders[peer_id] = peerConnection.addTrack(track, localStream);
+    var videoTrack = localStream.getVideoTracks()[0];
+    videoSenders[peer_id] = peerConnection.addTrack(videoTrack, localStream);
+    var audioTrack = localStream.getAudioTracks()[0];
+    audioSenders[peer_id] = peerConnection.addTrack(audioTrack, localStream);
     trace(peer_id + ' createAnswer start');
       // Since the 'remote' side has no media stream we need
       // to pass in the right constraints in order for it to
@@ -595,8 +601,10 @@ function call(peer_id) {
 function createOffer(peer_id) {
   var peerConnection = makeOrGetPeer(peer_id);
   trace(peer_id + ' Adding local stream to myPeerConnection');
-  var track = localStream.getVideoTracks()[0];
-  senders[peer_id] = peerConnection.addTrack(track, localStream);
+  var videoTrack = localStream.getVideoTracks()[0];
+  videoSenders[peer_id] = peerConnection.addTrack(videoTrack, localStream);
+  var audioTrack = localStream.getAudioTracks()[0];
+  audioSenders[peer_id] = peerConnection.addTrack(audioTrack, localStream);
   trace(peer_id + ' createOffer start');
   peerConnection.createOffer(offerOptions)
     .then(function(desc){
@@ -1095,5 +1103,9 @@ function enableMeetingScreenCapture() {
 function getScreen() {
 	//enable media if not already done
 	enableMeetingScreenCapture();
-	return window.navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+	var screenConstraint = {video: true}; 		// would take audio from localStream.
+	if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)
+		return navigator.mediaDevices.getDisplayMedia(screenConstraint);
+	else
+		return navigator.getDisplayMedia(screenConstraint);
 }

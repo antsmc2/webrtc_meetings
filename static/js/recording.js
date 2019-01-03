@@ -129,9 +129,9 @@ function recordVideo() {
 
 
 function stopRecording() {
-  videoRecordStream.getVideoTracks().forEach(track => track.stop());	
+  videoRecordStream.getTracks().forEach(track => track.stop());	
   videoMediaRecorder.stop();
-  console.log('video Recorded Blobs: ', recordedVideoBlobs);
+  console.log('video Recorded Blobs length: ', recordedVideoBlobs.length);
   recordButton.textContent = 'Start Recording';
   downloadButton.disabled = false;
   videoRecordStream = null;
@@ -179,5 +179,8 @@ function enableScreenCapture() {
 function getScreenMedia() {
 	//enable media if not already done
 	enableScreenCapture();
-	return window.navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+	if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) 
+		return navigator.mediaDevices.getDisplayMedia({video: true, audio: true});
+	else
+		return navigator.getDisplayMedia({video: true});
 }
