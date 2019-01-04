@@ -12,6 +12,7 @@ var myName = '';
 var serverUrl = null;
 var localStream = null;
 var localScreenStream = null;
+var activeStream = null;		// holds the stream currently been tracked with peers
 var iceURI = null;
 var peers = {};
 var audioSenders = {};
@@ -311,7 +312,7 @@ function start(onMediaInit) {
 }
 
 
-function refreshStream(stream) {
+function replaceStream(stream) {
 	setVideoStream(stream);
 	for(var peer_id in peers) {
 		var videoTrack = stream.getVideoTracks()[0];
@@ -332,7 +333,7 @@ function startScreenShare() {
 	  .then(function(stream) {
 	      trace('got display media');
 	      localScreenStream = stream;
-	      refreshStream(localScreenStream);
+	      replaceStream(localScreenStream);
 	  })
 	  .catch(function(e) {
 	    alert('error getting screen: ' + e.name);
@@ -343,7 +344,8 @@ function startScreenShare() {
 
 
 function setVideoStream(stream) {
-  trace('Received local stream');
+  trace('Received stream to set');
+  activeStream = stream;
   localVideoContainer.innerHTML = '';
   localVideo = document.createElement('video');
   localVideoContainer.appendChild(localVideo);
@@ -538,8 +540,8 @@ function handleOfferRequest(msg) {
     onSetRemoteSuccess(peer_id);
     var peerConnection = makeOrGetPeer(peer_id);
     trace('Adding remote stream to: ' + peer_id);
-    var videoTrack = localStream.getVideoTracks()[0];
-    videoSenders[peer_id] = peerConnection.addTrack(videoTrack, localStream);
+    var videoTrack = activeStream.getVideoTracks()[0];
+    videoSenders[peer_id] = peerConnection.addTrack(videoTrack, activeStream);
     var audioTrack = localStream.getAudioTracks()[0];
     audioSenders[peer_id] = peerConnection.addTrack(audioTrack, localStream);
     trace(peer_id + ' createAnswer start');
@@ -601,8 +603,8 @@ function call(peer_id) {
 function createOffer(peer_id) {
   var peerConnection = makeOrGetPeer(peer_id);
   trace(peer_id + ' Adding local stream to myPeerConnection');
-  var videoTrack = localStream.getVideoTracks()[0];
-  videoSenders[peer_id] = peerConnection.addTrack(videoTrack, localStream);
+  var videoTrack = activeStream.getVideoTracks()[0];
+  videoSenders[peer_id] = peerConnection.addTrack(videoTrack, activeStream);
   var audioTrack = localStream.getAudioTracks()[0];
   audioSenders[peer_id] = peerConnection.addTrack(audioTrack, localStream);
   trace(peer_id + ' createOffer start');
@@ -931,10 +933,10 @@ function toggleScreenShare() {
     if(shareScreenButton.textContent.toLowerCase() == 'share screen'){
     	if(!localScreenStream)
     		startScreenShare();
-    	else refreshStream(localScreenStream);
+    	else replaceStream(localScreenStream);
         shareScreenButton.textContent = 'Stop Screen Share';
     }else{
-    	refreshStream(localStream); 
+    	replaceStream(localStream); 
         shareScreenButton.textContent = 'Share Screen';
     }
 
@@ -987,6 +989,7 @@ function enableButtons() {
     muteAudioButton.disabled = false;
     muteVideoButton.disabled = false;
     toggleCallButton.disabled = false;
+    shareScreenButton.disabled = false;
     fileInput.disabled = false;
     //inverse for name setting enablement :)
     myNameField.disabled = true;
@@ -1000,6 +1003,7 @@ function enableButtons() {
 function disableButtons() {
     muteAudioButton.disabled = true;
     muteVideoButton.disabled = true;
+    shareScreenButton.disabled = true;
     fileInput.disabled = true;
     //inverse for name setting enablement :)
     myNameField.disabled = false;
