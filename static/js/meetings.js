@@ -106,24 +106,28 @@ function generateUniqueId() {
 
 
 function getUserMediaConstraints() {
-  var constraints = {};
-  constraints.audio = true;
-  constraints.video = {};
-  if (minWidthInput.value !== '0') {
-    constraints.video.width = {};
-    constraints.video.width.min = minWidthInput.value;
+  var supports = navigator.mediaDevices.getSupportedConstraints();
+  if (!supports["width"] || !supports["height"] || !supports["frameRate"] || !supports["facingMode"]) {
+	  // We're missing needed properties, so handle that error.
+	  return {audio: true, video: true};
   }
-  if (maxWidthInput.value !== '0') {
-    constraints.video.width = constraints.video.width || {};
-    constraints.video.width.max = maxWidthInput.value;
-  }
-  if (minHeightInput.value !== '0') {
-    constraints.video.height = {};
-    constraints.video.height.min = minHeightInput.value;
-  }
-  if (maxHeightInput.value !== '0') {
-    constraints.video.height = constraints.video.height || {};
-    constraints.video.height.max = maxHeightInput.value;
+  else {
+	  var constraints = {audio: true, video: {}};
+	  var minWidth = minWidthInput.value;
+	  var maxWidth = maxWidthInput.value;
+	  var maxHeight = maxHeightInput.value;
+	  var minHeight = minHeightInput.value;
+	  var constraints = {
+		  video: {
+			    width: { min: minWidth, ideal: 1920 },
+			    height: { min: minHeight, ideal: 1080 },
+			    aspectRatio: { ideal: 16.0/9.0 }
+			  },
+		  audio: {
+		    sampleSize: 16,
+		    channelCount: 2
+		  }
+	  }
   }
 //  if (framerateInput.value !== '0') {
 //    constraints.video.frameRate = {};
